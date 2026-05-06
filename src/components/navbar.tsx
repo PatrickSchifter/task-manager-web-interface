@@ -153,7 +153,11 @@ export default function NavbarComponent() {
             }
           }}
         >
-          <p className="font-bold text-inherit">Solut Tasks</p>
+          <img
+            src="/solut-tasks-logo.png"
+            alt="Solut Tasks Logo"
+            className="h-12 w-auto"
+          />
         </div>
       </NavbarBrand>
 
@@ -176,12 +180,12 @@ export default function NavbarComponent() {
                 <p className="font-semibold">Conectado como</p>
                 <p className="font-semibold">{me?.email ?? ""}</p>
               </DropdownItem>
-<DropdownItem key="settings" onPress={settings.onOpen}>
-                  Minhas Configurações
-                </DropdownItem>
-                <DropdownItem key="logout" color="danger" onPress={handleLogout}>
-                  Sair
-                </DropdownItem>
+              <DropdownItem key="settings" onPress={settings.onOpen}>
+                Minhas Configurações
+              </DropdownItem>
+              <DropdownItem key="logout" color="danger" onPress={handleLogout}>
+                Sair
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         ) : null}
