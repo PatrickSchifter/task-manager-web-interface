@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
     setValidationError("");
 
     if (newPassword !== confirmPassword) {
-      setValidationError("Passwords do not match.");
+      setValidationError("As senhas não coincidem.");
       return;
     }
 
@@ -46,30 +46,30 @@ export default function ResetPasswordPage() {
         <img
           src="solut-tasks-logo.png"
           className="rounded-full w-70 m-auto"
-          alt="Solut Tasks Logo"
+          alt="Logo Solut Tasks"
         />
       </div>
       <section className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md">
           <CardHeader className="flex flex-col items-start gap-1">
-            <h1 className="text-xl font-semibold">Reset your password</h1>
+            <h1 className="text-xl font-semibold">Redefinir sua senha</h1>
             <p className="text-sm text-gray-500">
-              Enter your new password below
+              Digite sua nova senha abaixo
             </p>
           </CardHeader>
           <CardBody className="space-y-4">
             {resetPasswordMutation.isSuccess ? (
               <p className="text-sm text-green-600">
-                Your password has been reset successfully.{" "}
+                Sua senha foi redefinida com sucesso.{" "}
                 <Link className="text-primary" to="/signin">
-                  Sign in
+                  Entrar
                 </Link>
               </p>
             ) : (
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <Input
-                  label="New Password"
-                  placeholder="Enter your new password"
+                  label="Nova Senha"
+                  placeholder="Digite sua nova senha"
                   type="password"
                   value={newPassword}
                   onValueChange={(val) => {
@@ -80,8 +80,8 @@ export default function ResetPasswordPage() {
                   autoComplete="new-password"
                 />
                 <Input
-                  label="Confirm Password"
-                  placeholder="Confirm your new password"
+                  label="Confirmar Senha"
+                  placeholder="Confirme sua nova senha"
                   type="password"
                   value={confirmPassword}
                   onValueChange={(val) => {
@@ -101,26 +101,25 @@ export default function ResetPasswordPage() {
                   isDisabled={!token}
                 >
                   {resetPasswordMutation.isPending
-                    ? "Resetting..."
-                    : "Reset password"}
+                    ? "Redefinindo..."
+                    : "Redefinir senha"}
                 </Button>
               </form>
             )}
             {resetPasswordMutation.isError ? (
               <p className="text-sm text-red-500">
-                Something went wrong. Please try again or request a new reset
-                link.
+                Algo deu errado. Tente novamente ou solicite um novo link.
               </p>
             ) : null}
             {!token ? (
               <p className="text-sm text-red-500">
-                Invalid or missing reset token.
+                Token de recuperação inválido ou ausente.
               </p>
             ) : null}
             <p className="text-sm text-gray-500">
-              Remembered your password?{" "}
+              Lembrou da sua senha?{" "}
               <Link className="text-primary" to="/signin">
-                Sign in
+                Entrar
               </Link>
             </p>
           </CardBody>

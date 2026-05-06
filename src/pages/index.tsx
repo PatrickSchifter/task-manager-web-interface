@@ -32,11 +32,11 @@ export default function IndexPage() {
       onClose();
       await queryClient.invalidateQueries({ queryKey: ["projects", "list"] });
       const { addToast } = await import("@heroui/toast");
-      addToast({ title: "Project created successfully", color: "success" });
+      addToast({ title: "Projeto criado com sucesso", color: "success" });
     },
     onError: async () => {
       const { addToast } = await import("@heroui/toast");
-      addToast({ title: "Failed to create project", color: "danger" });
+      addToast({ title: "Falha ao criar projeto", color: "danger" });
     },
   });
 
@@ -44,9 +44,9 @@ export default function IndexPage() {
     <DefaultLayout>
       <section className="py-8 md:py-10">
         <div className="mb-6 flex items-center justify-between px-2">
-          <h1 className="text-xl font-semibold">Your Projects</h1>
+          <h1 className="text-xl font-semibold">Seus Projetos</h1>
           <Button color="primary" onPress={onOpen}>
-            Add project
+            Adicionar projeto
           </Button>
         </div>
 
@@ -63,7 +63,7 @@ export default function IndexPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 px-2 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.length === 0 && <p>No projects found.</p>}
+            {projects.length === 0 && <p>Nenhum projeto encontrado.</p>}
             {projects.map((project) => (
               <Card
                 key={project.id}
@@ -86,14 +86,14 @@ export default function IndexPage() {
       <ProjectForm
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        title="Add project"
+        title="Adicionar projeto"
         name={name}
         description={description}
         onNameChange={setName}
         onDescriptionChange={setDescription}
         onSubmit={() => createProjectMutation.mutate()}
         isLoading={createProjectMutation.isPending}
-        submitButtonText="Create"
+        submitButtonText="Criar"
       />
     </DefaultLayout>
   );

@@ -52,20 +52,20 @@ export default function SignupPage() {
         <img
           src="solut-tasks-logo.png"
           className="rounded-full w-70 m-auto"
-          alt="Solut Tasks Logo"
+          alt="Logo Solut Tasks"
         />
       </div>
       <section className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md">
           <CardHeader className="flex flex-col items-start gap-1">
-            <h1 className="text-xl font-semibold">Create your account</h1>
-            <p className="text-sm text-gray-500">Sign up to get started</p>
+            <h1 className="text-xl font-semibold">Criar sua conta</h1>
+            <p className="text-sm text-gray-500">Cadastre-se para começar</p>
           </CardHeader>
           <CardBody className="space-y-4">
             <form className="space-y-4" onSubmit={handleSubmit}>
               <Input
-                label="Name"
-                placeholder="John Doe"
+                label="Nome"
+                placeholder="João Silva"
                 type="text"
                 value={name}
                 onValueChange={setName}
@@ -73,8 +73,8 @@ export default function SignupPage() {
                 autoComplete="name"
               />
               <Input
-                label="Email"
-                placeholder="you@example.com"
+                label="E-mail"
+                placeholder="seu@email.com"
                 type="email"
                 value={email}
                 onValueChange={setEmail}
@@ -82,7 +82,7 @@ export default function SignupPage() {
                 autoComplete="email"
               />
               <Input
-                label="Password"
+                label="Senha"
                 placeholder="••••••••"
                 type="password"
                 value={password}
@@ -96,18 +96,18 @@ export default function SignupPage() {
                 type="submit"
                 isLoading={signupMutation.isPending}
               >
-                {signupMutation.isPending ? "Creating..." : "Create account"}
+                {signupMutation.isPending ? "Criando..." : "Criar conta"}
               </Button>
             </form>
             {signupMutation.isError ? (
               <p className="text-sm text-red-500">
-                Unable to create your account. Please try again.
+                Não foi possível criar sua conta. Tente novamente.
               </p>
             ) : null}
             <p className="text-sm text-gray-500">
-              Already have an account?{" "}
+              Já tem uma conta?{" "}
               <Link className="text-primary" to="/signin">
-                Sign in
+                Entrar
               </Link>
             </p>
           </CardBody>

@@ -34,9 +34,9 @@ interface MembersModalProps {
 }
 
 const ROLE_LABELS = {
-  OWNER: "Owner",
+  OWNER: "Proprietário",
   EDITOR: "Editor",
-  VIEWER: "Viewer",
+  VIEWER: "Visualizador",
 } as const;
 
 export default function MembersModal({
@@ -92,10 +92,10 @@ export default function MembersModal({
       setSelectedUserId("");
       setSelectedRole("EDITOR");
       onAddClose();
-      addToast({ title: "Collaborator added successfully", color: "success" });
+      addToast({ title: "Colaborador adicionado com sucesso", color: "success" });
     },
     onError: async () => {
-      addToast({ title: "Failed to add collaborator", color: "danger" });
+      addToast({ title: "Falha ao adicionar colaborador", color: "danger" });
     },
   });
 
@@ -106,10 +106,10 @@ export default function MembersModal({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "members"] });
       setEditingMember(null);
-      addToast({ title: "Member role updated successfully", color: "success" });
+      addToast({ title: "Função do membro atualizada com sucesso", color: "success" });
     },
     onError: async () => {
-      addToast({ title: "Failed to update member role", color: "danger" });
+      addToast({ title: "Falha ao atualizar função do membro", color: "danger" });
     },
   });
 
@@ -120,10 +120,10 @@ export default function MembersModal({
       await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "members"] });
       setMemberToRemove(null);
       onRemoveClose();
-      addToast({ title: "Collaborator removed successfully", color: "success" });
+      addToast({ title: "Colaborador removido com sucesso", color: "success" });
     },
     onError: async () => {
-      addToast({ title: "Failed to remove collaborator", color: "danger" });
+      addToast({ title: "Falha ao remover colaborador", color: "danger" });
     },
   });
 
@@ -165,9 +165,9 @@ export default function MembersModal({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-xl font-semibold">Project Members</h2>
+                <h2 className="text-xl font-semibold">Membros do Projeto</h2>
                 <p className="text-sm text-gray-500">
-                  Manage who can access and collaborate on this project
+                  Gerencie quem pode acessar e colaborar neste projeto
                 </p>
               </ModalHeader>
               <ModalBody>
@@ -181,12 +181,12 @@ export default function MembersModal({
                         onPress={onAddOpen}
                         isDisabled={availableUsers.length === 0}
                       >
-                        Add Collaborator
+                        Adicionar Colaborador
                       </Button>
                     </div>
                     {availableUsers.length === 0 && (
                       <p className="text-sm text-gray-500">
-                        All users are already collaborators of this project
+                        Todos os usuários já são colaboradores deste projeto
                       </p>
                     )}
                   </div>
@@ -195,7 +195,7 @@ export default function MembersModal({
                 {/* Current Members List */}
                 <div>
                   <h3 className="text-lg font-medium mb-4">
-                    Current Collaborators ({members.length})
+                    Colaboradores Atuais ({members.length})
                   </h3>
 
                   {isLoadingMembers ? (
@@ -217,8 +217,8 @@ export default function MembersModal({
                     </div>
                   ) : members.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      <p>No members found</p>
-                      <p className="text-sm">Add members to start collaborating</p>
+                      <p>Nenhum membro encontrado</p>
+                      <p className="text-sm">Adicione membros para começar a colaborar</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -263,7 +263,7 @@ export default function MembersModal({
                                       size="sm"
                                       variant="light"
                                       onPress={() => openEditRole(member)}
-                                      aria-label="Edit role"
+                                      aria-label="Editar função"
                                     >
                                       <EditIcon className="h-4 w-4" />
                                     </Button>
@@ -273,7 +273,7 @@ export default function MembersModal({
                                       variant="light"
                                       color="danger"
                                       onPress={() => openRemoveModal(member)}
-                                      aria-label="Remove collaborator"
+                                      aria-label="Remover colaborador"
                                     >
                                       <DeleteIcon className="h-4 w-4" />
                                     </Button>
@@ -290,7 +290,7 @@ export default function MembersModal({
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Close
+                  Fechar
                 </Button>
               </ModalFooter>
             </>
@@ -303,15 +303,15 @@ export default function MembersModal({
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Add New Member</ModalHeader>
+              <ModalHeader>Adicionar Novo Membro</ModalHeader>
               <ModalBody className="space-y-4">
                 <Select
-                  label="Select User"
-                  placeholder="Choose a user to add"
+                  label="Selecionar Usuário"
+                  placeholder="Escolha um usuário para adicionar"
                   data-testid="choose-user-select"
                   selectedKeys={selectedUserId ? [selectedUserId] : []}
                   onSelectionChange={(keys) => setSelectedUserId(Array.from(keys)[0] as string)}
-                  description="Select a user from the list below"
+                  description="Selecione um usuário da lista abaixo"
                 >
                   {availableUsers.map((user) => (
                     <SelectItem
@@ -336,22 +336,22 @@ export default function MembersModal({
                 </Select>
 
                 <Select
-                  label="Role"
+                  label="Função"
                   selectedKeys={[selectedRole]}
                   onSelectionChange={(keys) =>
                     setSelectedRole(Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER")
                   }
                 >
-                  <SelectItem key="VIEWER">Viewer - Can view project and tasks</SelectItem>
-                  <SelectItem key="EDITOR">Editor - Can create and edit tasks</SelectItem>
+                  <SelectItem key="VIEWER">Visualizador - Pode visualizar projeto e tarefas</SelectItem>
+                  <SelectItem key="EDITOR">Editor - Pode criar e editar tarefas</SelectItem>
                   <SelectItem key="OWNER">
-                    Owner - Full access including member management
+                    Proprietário - Acesso completo incluindo gerenciamento de membros
                   </SelectItem>
                 </Select>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button
                   color="primary"
@@ -360,7 +360,7 @@ export default function MembersModal({
                   isDisabled={!selectedUserId}
                   data-testid="btn-add-collaborator-modal"
                 >
-                  Add Collaborator
+                  Adicionar Colaborador
                 </Button>
               </ModalFooter>
             </>
@@ -374,7 +374,7 @@ export default function MembersModal({
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader>Edit Member Role</ModalHeader>
+                <ModalHeader>Editar Função do Membro</ModalHeader>
                 <ModalBody className="space-y-4">
                   <div className="flex items-center gap-3">
                     <Avatar
@@ -393,29 +393,29 @@ export default function MembersModal({
                   </div>
 
                   <Select
-                    label="New Role"
+                    label="Nova Função"
                     selectedKeys={[newRole]}
                     onSelectionChange={(keys) =>
                       setNewRole(Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER")
                     }
                   >
-                    <SelectItem key="VIEWER">Viewer - Can view project and tasks</SelectItem>
-                    <SelectItem key="EDITOR">Editor - Can create and edit tasks</SelectItem>
+                    <SelectItem key="VIEWER">Visualizador - Pode visualizar projeto e tarefas</SelectItem>
+                    <SelectItem key="EDITOR">Editor - Pode criar e editar tarefas</SelectItem>
                     <SelectItem key="OWNER">
-                      Owner - Full access including member management
+                      Proprietário - Acesso completo incluindo gerenciamento de membros
                     </SelectItem>
                   </Select>
                 </ModalBody>
                 <ModalFooter>
                   <Button variant="light" onPress={onClose}>
-                    Cancel
+                    Cancelar
                   </Button>
                   <Button
                     color="primary"
                     onPress={handleUpdateRole}
                     isLoading={updateRoleMutation.isPending}
                   >
-                    Update Role
+                    Atualizar Função
                   </Button>
                 </ModalFooter>
               </>
@@ -428,9 +428,9 @@ export default function MembersModal({
       <ConfirmationModal
         isOpen={isRemoveOpen}
         onOpenChange={onRemoveOpenChange}
-        title="Remove Collaborator"
-        message={`Are you sure you want to remove ${memberToRemove?.user.name} from this project? They will lose access immediately.`}
-        confirmButtonText="Remove collaborator"
+        title="Remover Colaborador"
+        message={`Tem certeza que deseja remover ${memberToRemove?.user.name} deste projeto? Ele perderá o acesso imediatamente.`}
+        confirmButtonText="Remover colaborador"
         confirmButtonColor="danger"
         onConfirm={handleRemoveMember}
         isLoading={removeMemberMutation.isPending}

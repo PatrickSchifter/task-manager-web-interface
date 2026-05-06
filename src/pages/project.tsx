@@ -40,9 +40,9 @@ type TaskStatus = TaskRequest["status"]; // "TODO" | "IN_PROGRESS" | "DONE"
 type TaskPriority = TaskRequest["priority"]; // "LOW" | "MEDIUM" | "HIGH"
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
-  TODO: "To Do",
-  IN_PROGRESS: "In Progress",
-  DONE: "Done",
+  TODO: "A Fazer",
+  IN_PROGRESS: "Em Progresso",
+  DONE: "Concluído",
 };
 
 export default function ProjectPage() {
@@ -128,7 +128,7 @@ export default function ProjectPage() {
       onEditClose();
       setEditName("");
       setEditDescription("");
-      addToast({ title: "Project edited successfully", color: "success" });
+      addToast({ title: "Projeto atualizado com sucesso", color: "success" });
     },
   });
 
@@ -136,7 +136,7 @@ export default function ProjectPage() {
   const deleteProjectMutation = useMutation({
     mutationFn: () => deleteProject(projectId as string),
     onSuccess: () => {
-      addToast({ title: "Project deleted successfully", color: "success" });
+      addToast({ title: "Projeto excluído com sucesso", color: "success" });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       navigate("/");
     },
@@ -186,11 +186,11 @@ export default function ProjectPage() {
         queryKey: ["projects", projectId, "tasks"],
       });
       const { addToast } = await import("@heroui/toast");
-      addToast({ title: "Task created successfully", color: "success" });
+      addToast({ title: "Tarefa criada com sucesso", color: "success" });
     },
     onError: async () => {
       const { addToast } = await import("@heroui/toast");
-      addToast({ title: "Failed to create task", color: "danger" });
+      addToast({ title: "Falha ao criar tarefa", color: "danger" });
     },
   });
 
@@ -230,7 +230,7 @@ export default function ProjectPage() {
           <div className="flex flex-col">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-semibold">
-                {project?.name ?? "Project"}
+                {project?.name ?? "Projeto"}
               </h1>
               {isOwner && (
                 <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export default function ProjectPage() {
                     size="sm"
                     variant="light"
                     onPress={handleEditProject}
-                    aria-label="Edit project"
+                    aria-label="Editar projeto"
                   >
                     <EditIcon className="h-4 w-4" />
                   </Button>
@@ -249,7 +249,7 @@ export default function ProjectPage() {
                     variant="light"
                     color="danger"
                     onPress={onDeleteOpen}
-                    aria-label="Delete project"
+                    aria-label="Excluir projeto"
                   >
                     <DeleteIcon className="h-4 w-4" />
                   </Button>
@@ -265,12 +265,12 @@ export default function ProjectPage() {
           <div className="flex gap-2">
             {canAddTask && (
               <Button color="primary" onPress={() => openAddTask("TODO")}>
-                Add task
+                Adicionar tarefa
               </Button>
             )}
             {isOwner && (
               <Button color="secondary" variant="flat" onPress={onMembersOpen}>
-                Collaborators
+                Colaboradores
               </Button>
             )}
           </div>
@@ -296,16 +296,16 @@ export default function ProjectPage() {
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader className="flex flex-col">Add task</ModalHeader>
+              <ModalHeader className="flex flex-col">Adicionar tarefa</ModalHeader>
               <ModalBody className="space-y-3">
                 <Input
-                  label="Title"
+                  label="Título"
                   value={title}
                   onValueChange={setTitle}
                   isRequired
                 />
                 <Textarea
-                  label="Description"
+                  label="Descrição"
                   value={description}
                   onValueChange={setDescription}
                   minRows={3}
@@ -317,33 +317,33 @@ export default function ProjectPage() {
                     setStatus(Array.from(keys)[0] as TaskStatus)
                   }
                 >
-                  <SelectItem key="TODO">To Do</SelectItem>
-                  <SelectItem key="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem key="DONE">Done</SelectItem>
+                  <SelectItem key="TODO">A Fazer</SelectItem>
+                  <SelectItem key="IN_PROGRESS">Em Progresso</SelectItem>
+                  <SelectItem key="DONE">Concluído</SelectItem>
                 </Select>
                 <Select
-                  label="Priority"
+                  label="Prioridade"
                   selectedKeys={[priority]}
                   onSelectionChange={(keys) =>
                     setPriority(Array.from(keys)[0] as TaskPriority)
                   }
                 >
-                  <SelectItem key="LOW">Low</SelectItem>
-                  <SelectItem key="MEDIUM">Medium</SelectItem>
-                  <SelectItem key="HIGH">High</SelectItem>
+                  <SelectItem key="LOW">Baixa</SelectItem>
+                  <SelectItem key="MEDIUM">Média</SelectItem>
+                  <SelectItem key="HIGH">Alta</SelectItem>
                 </Select>
 
                 <Input
                   type="date"
-                  label="Due date"
-                  placeholder="YYYY-MM-DD HH:mm"
+                  label="Data de entrega"
+                  placeholder="DD/MM/AAAA HH:mm"
                   value={dueDate ?? ""}
                   onChange={(e) => setDueDate(e.target.value)}
                 />
 
                 <Select
-                  label="Assignee"
-                  placeholder="Select assignee"
+                  label="Responsável"
+                  placeholder="Selecionar responsável"
                   selectedKeys={assigneeId ? [String(assigneeId)] : []}
                   onSelectionChange={(keys) => {
                     if (keys === "all") return;
@@ -392,7 +392,7 @@ export default function ProjectPage() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={close}>
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button
                   color="primary"
@@ -400,7 +400,7 @@ export default function ProjectPage() {
                   isLoading={createTaskMutation.isPending}
                   isDisabled={!title.trim()}
                 >
-                  Create
+                  Criar
                 </Button>
               </ModalFooter>
             </>
@@ -412,14 +412,14 @@ export default function ProjectPage() {
       <ProjectForm
         isOpen={isEditOpen}
         onOpenChange={onEditOpenChange}
-        title="Edit Project"
+        title="Editar Projeto"
         name={editName}
         description={editDescription}
         onNameChange={setEditName}
         onDescriptionChange={setEditDescription}
         onSubmit={handleEditSubmit}
         isLoading={editProjectMutation.isPending}
-        submitButtonText="Update Project"
+        submitButtonText="Atualizar Projeto"
         project={project}
       />
 
@@ -427,10 +427,10 @@ export default function ProjectPage() {
       <ConfirmationModal
         isOpen={isDeleteOpen}
         onOpenChange={onDeleteOpenChange}
-        title="Delete Project"
-        message={`Are you sure you want to delete "${project?.name}"? This action cannot be undone and will delete all tasks within this project.`}
-        confirmButtonText="Delete Project"
-        cancelButtonText="Cancel"
+        title="Excluir Projeto"
+        message={`Tem certeza que deseja excluir "${project?.name}"? Esta ação não pode ser desfeita e excluirá todas as tarefas deste projeto.`}
+        confirmButtonText="Excluir Projeto"
+        cancelButtonText="Cancelar"
         confirmButtonColor="danger"
         onConfirm={handleDeleteProject}
         isLoading={deleteProjectMutation.isPending}

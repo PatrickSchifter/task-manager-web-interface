@@ -42,22 +42,22 @@ export default function SigninPage() {
         <img
           src="solut-tasks-logo.png"
           className="rounded-full w-70 m-auto"
-          alt="Solut Tasks Logo"
+          alt="Logo Solut Tasks"
         />
       </div>
       <section className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md">
           <CardHeader className="flex flex-col items-start gap-1">
-            <h1 className="text-xl font-semibold">Sign in</h1>
+            <h1 className="text-xl font-semibold">Entrar</h1>
             <p className="text-sm text-gray-500">
-              Sign in with your credentials
+              Entre com suas credenciais
             </p>
           </CardHeader>
           <CardBody className="space-y-4">
             <form className="space-y-4" onSubmit={handleSubmit}>
               <Input
-                label="Email"
-                placeholder="you@example.com"
+                label="E-mail"
+                placeholder="seu@email.com"
                 type="email"
                 value={email}
                 onValueChange={setEmail}
@@ -65,7 +65,7 @@ export default function SigninPage() {
                 autoComplete="email"
               />
               <Input
-                label="Password"
+                label="Senha"
                 placeholder="••••••••"
                 type="password"
                 value={password}
@@ -79,24 +79,24 @@ export default function SigninPage() {
                 type="submit"
                 isLoading={signinMutation.isPending}
               >
-                {signinMutation.isPending ? "Signing in..." : "Sign in"}
+                {signinMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
             </form>
             {signinMutation.isError ? (
               <p className="text-sm text-red-500">
-                Unable to sign in. Please check your credentials and try again.
+                Não foi possível entrar. Verifique suas credenciais e tente novamente.
               </p>
             ) : null}
             <p className="text-sm text-gray-500">
-              Don&apos;t have an account?{" "}
+              Não tem uma conta?{" "}
               <Link className="text-primary" to="/signup">
-                Sign up
+                Cadastre-se
               </Link>
             </p>
             <p className="text-sm text-gray-500">
-              Forgot your password?{" "}
+              Esqueceu sua senha?{" "}
               <Link className="text-primary" to="/forgot-password">
-                Forgot Password
+                Recuperar Senha
               </Link>
             </p>
           </CardBody>

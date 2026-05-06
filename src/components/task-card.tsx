@@ -91,12 +91,12 @@ const TaskCard = ({
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks"],
       });
-      addToast({ title: "Task deleted successfully", color: "success" });
+      addToast({ title: "Tarefa excluída com sucesso", color: "success" });
       onTaskDeleteClose();
       onClose();
     },
     onError: () => {
-      addToast({ title: "Failed to delete task", color: "danger" });
+      addToast({ title: "Falha ao excluir tarefa", color: "danger" });
     },
   });
 
@@ -200,10 +200,10 @@ const TaskCard = ({
         }),
       ]);
       setIsEditing(false);
-      addToast({ title: "Task updated successfully", color: "success" });
+      addToast({ title: "Tarefa atualizada com sucesso", color: "success" });
     },
     onError: () => {
-      addToast({ title: "Failed to update task", color: "danger" });
+      addToast({ title: "Falha ao atualizar tarefa", color: "danger" });
     },
   });
 
@@ -219,10 +219,10 @@ const TaskCard = ({
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks", taskId, "comments"],
       });
-      addToast({ title: "Comment added successfully", color: "success" });
+      addToast({ title: "Comentário adicionado com sucesso", color: "success" });
     },
     onError: () => {
-      addToast({ title: "Failed to add comment", color: "danger" });
+      addToast({ title: "Falha ao adicionar comentário", color: "danger" });
     },
   });
 
@@ -239,10 +239,10 @@ const TaskCard = ({
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks", taskId, "comments"],
       });
-      addToast({ title: "Comment updated", color: "success" });
+      addToast({ title: "Comentário atualizado", color: "success" });
     },
     onError: () => {
-      addToast({ title: "Failed to update comment", color: "danger" });
+      addToast({ title: "Falha ao atualizar comentário", color: "danger" });
     },
   });
 
@@ -255,10 +255,10 @@ const TaskCard = ({
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks", taskId, "comments"],
       });
-      addToast({ title: "Comment deleted successfully", color: "success" });
+      addToast({ title: "Comentário excluído com sucesso", color: "success" });
     },
     onError: () => {
-      addToast({ title: "Failed to delete comment", color: "danger" });
+      addToast({ title: "Falha ao excluir comentário", color: "danger" });
     },
   });
 
@@ -410,12 +410,12 @@ const TaskCard = ({
                 {isEditing ? (
                   canEdit ? (
                     <Input
-                      label="Title"
-                      placeholder="Enter task title"
+                      label="Título"
+                      placeholder="Digite o título da tarefa"
                       variant="bordered"
                       value={editTitle}
                       onValueChange={setEditTitle}
-                      aria-label="Task title"
+                      aria-label="Título da tarefa"
                     />
                   ) : (
                     <h2 className="text-xl font-semibold">
@@ -435,7 +435,7 @@ const TaskCard = ({
                           onPress={handleDeleteMode}
                           startContent={<DeleteIcon size={16} />}
                         >
-                          Delete
+                          Excluir
                         </Button>
                       )}
                       {canEdit && (
@@ -444,7 +444,7 @@ const TaskCard = ({
                           onPress={handleEditMode}
                           startContent={<EditIcon size={16} />}
                         >
-                          Edit
+                          Editar
                         </Button>
                       )}
                     </div>
@@ -457,8 +457,8 @@ const TaskCard = ({
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <div className="md:col-span-2 space-y-4">
                       <Textarea
-                        label="Description"
-                        placeholder="Add a description..."
+                        label="Descrição"
+                        placeholder="Adicione uma descrição..."
                         value={editDescription}
                         onValueChange={setEditDescription}
                         minRows={4}
@@ -466,15 +466,15 @@ const TaskCard = ({
                     </div>
                     <div className="md:col-span-1 space-y-4">
                       <Select
-                        label="Priority"
+                        label="Prioridade"
                         selectedKeys={[editPriority]}
                         onSelectionChange={(keys) =>
                           setEditPriority(Array.from(keys)[0] as string)
                         }
                       >
-                        <SelectItem key="LOW">Low</SelectItem>
-                        <SelectItem key="MEDIUM">Medium</SelectItem>
-                        <SelectItem key="HIGH">High</SelectItem>
+                        <SelectItem key="LOW">Baixa</SelectItem>
+                        <SelectItem key="MEDIUM">Média</SelectItem>
+                        <SelectItem key="HIGH">Alta</SelectItem>
                       </Select>
                       <Select
                         label="Status"
@@ -483,20 +483,20 @@ const TaskCard = ({
                           setEditStatus(Array.from(keys)[0] as string)
                         }
                       >
-                        <SelectItem key="TODO">To Do</SelectItem>
-                        <SelectItem key="IN_PROGRESS">In Progress</SelectItem>
-                        <SelectItem key="DONE">Done</SelectItem>
+                        <SelectItem key="TODO">A Fazer</SelectItem>
+                        <SelectItem key="IN_PROGRESS">Em Progresso</SelectItem>
+                        <SelectItem key="DONE">Concluído</SelectItem>
                       </Select>
                       <Input
                         type="date"
-                        label="Due date"
-                        placeholder="DD-MM-YYYY"
+                        label="Data de entrega"
+                        placeholder="DD/MM/AAAA"
                         value={editDueDate ?? ""}
                         onChange={(e) => setEditDueDate(e.target.value)}
                       />
                       <Select
-                        label="Assignee"
-                        placeholder="Select assignee"
+                        label="Responsável"
+                        placeholder="Selecionar responsável"
                         selectedKeys={
                           editAssigneeId ? [String(editAssigneeId)] : []
                         }
@@ -560,23 +560,29 @@ const TaskCard = ({
                       <div className="md:col-span-2 space-y-4">
                         <div>
                           <h4 className="text-sm font-medium text-gray-700">
-                            Description
+                            Descrição
                           </h4>
                           <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
                             {typeof fullTask?.description === "string" &&
                             (fullTask.description as string).trim()
                               ? fullTask.description
-                              : "No description provided"}
+                              : "Nenhuma descrição fornecida"}
                           </p>
                         </div>
                       </div>
                       <div className="md:col-span-1 space-y-4">
                         <div>
                           <h4 className="text-sm font-medium text-gray-700">
-                            Priority
+                            Prioridade
                           </h4>
                           <p className="mt-1 text-sm text-gray-900">
-                            {fullTask?.priority || priority}
+                            {fullTask?.priority === "LOW"
+                              ? "Baixa"
+                              : fullTask?.priority === "MEDIUM"
+                                ? "Média"
+                                : fullTask?.priority === "HIGH"
+                                  ? "Alta"
+                                  : fullTask?.priority || priority}
                           </p>
                         </div>
                         <div>
@@ -585,17 +591,17 @@ const TaskCard = ({
                           </h4>
                           <p className="mt-1 text-sm text-gray-900">
                             {fullTask?.status === "TODO"
-                              ? "To Do"
+                              ? "A Fazer"
                               : fullTask?.status === "IN_PROGRESS"
-                                ? "In Progress"
+                                ? "Em Progresso"
                                 : fullTask?.status === "DONE"
-                                  ? "Done"
+                                  ? "Concluído"
                                   : fullTask?.status || status}
                           </p>
                         </div>
                         <div>
                           <h4 className="text-sm font-medium text-gray-700">
-                            Due date
+                            Data de entrega
                           </h4>
                           <p className="mt-1 text-sm text-gray-900">
                             {displayDue}
@@ -603,7 +609,7 @@ const TaskCard = ({
                         </div>
                         <div>
                           <h4 className="text-sm font-medium text-gray-700">
-                            Assignee
+                            Responsável
                           </h4>
                           {fullTask?.assignee || assignee ? (
                             <div className="mt-1 flex items-center gap-2">
@@ -624,7 +630,7 @@ const TaskCard = ({
                             </div>
                           ) : (
                             <p className="mt-1 text-sm text-gray-500">
-                              Unassigned
+                              Não atribuído
                             </p>
                           )}
                         </div>
@@ -633,7 +639,7 @@ const TaskCard = ({
 
                     {/* Comments Section */}
                     <div className="border-t pt-6">
-                      <h3 className="text-lg font-semibold mb-4">Comments</h3>
+                      <h3 className="text-lg font-semibold mb-4">Comentários</h3>
 
                       {/* Comments List */}
                       <div className="space-y-3 max-h-60 overflow-y-auto mb-4">
@@ -658,9 +664,9 @@ const TaskCard = ({
                           </>
                         ) : comments.length === 0 ? (
                           <div className="text-center py-4 text-gray-500">
-                            <p>No comments yet</p>
+                            <p>Nenhum comentário ainda</p>
                             <p className="text-sm">
-                              Be the first to add a comment!
+                              Seja o primeiro a comentar!
                             </p>
                           </div>
                         ) : (
@@ -724,7 +730,7 @@ const TaskCard = ({
                                       value={editingContent}
                                       onValueChange={setEditingContent}
                                       minRows={2}
-                                      placeholder="Edit your comment..."
+                                      placeholder="Editar seu comentário..."
                                     />
                                     <div className="flex gap-2">
                                       <Button
@@ -740,14 +746,14 @@ const TaskCard = ({
                                         }
                                         isDisabled={!editingContent.trim()}
                                       >
-                                        Save
+Salvar
                                       </Button>
                                       <Button
                                         size="sm"
                                         variant="light"
                                         onPress={handleCancelEdit}
                                       >
-                                        Cancel
+Cancelar
                                       </Button>
                                     </div>
                                   </div>
@@ -769,7 +775,7 @@ const TaskCard = ({
                           value={newComment}
                           onValueChange={setNewComment}
                           minRows={2}
-                          placeholder="Write your comment here..."
+                          placeholder="Escreva seu comentário aqui..."
                         />
                         <div className="flex justify-end">
                           <Button
@@ -778,7 +784,7 @@ const TaskCard = ({
                             isLoading={createCommentMutation.isPending}
                             isDisabled={!newComment.trim()}
                           >
-                            Add Comment
+Adicionar Comentário
                           </Button>
                         </div>
                       </div>
@@ -802,7 +808,7 @@ const TaskCard = ({
                   </>
                 ) : (
                   <Button variant="light" onPress={onClose}>
-                    Close
+Fechar
                   </Button>
                 )}
               </ModalFooter>
@@ -814,10 +820,10 @@ const TaskCard = ({
       <ConfirmationModal
         isOpen={isDeleteOpen}
         onOpenChange={onDeleteOpenChange}
-        title="Delete Comment"
-        message="Are you sure you want to delete this comment? This action cannot be undone."
-        confirmButtonText="Delete"
-        cancelButtonText="Cancel"
+        title="Excluir Comentário"
+        message="Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita."
+        confirmButtonText="Excluir"
+        cancelButtonText="Cancelar"
         confirmButtonColor="danger"
         onConfirm={confirmDeleteComment}
         isLoading={deleteCommentMutation.isPending}
@@ -826,10 +832,10 @@ const TaskCard = ({
       <ConfirmationModal
         isOpen={isTaskDeleteOpen}
         onOpenChange={onTaskDeleteOpenChange}
-        title="Delete Task"
-        message="Are you sure you want to delete this task? This action cannot be undone."
-        confirmButtonText="Delete"
-        cancelButtonText="Cancel"
+        title="Excluir Tarefa"
+        message="Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita."
+        confirmButtonText="Excluir"
+        cancelButtonText="Cancelar"
         confirmButtonColor="danger"
         onConfirm={confirmDeleteTask}
         isLoading={deleteTaskMutation.isPending}

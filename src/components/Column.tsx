@@ -72,12 +72,12 @@ export default function Column({
               queryKey: ["projects", projectId, "tasks"],
               type: "active",
             });
-            addToast({ title: "Task moved", color: "success" });
+            addToast({ title: "Tarefa movida", color: "success" });
           } catch {
             await queryClient.invalidateQueries({
               queryKey: ["projects", projectId, "tasks"],
             });
-            addToast({ title: "Failed to move task", color: "danger" });
+            addToast({ title: "Falha ao mover tarefa", color: "danger" });
           }
         })();
       },
@@ -147,7 +147,7 @@ export default function Column({
             />
           ))
         ) : (
-          <p className="text-xs text-gray-400">No tasks</p>
+          <p className="text-xs text-gray-400">Nenhuma tarefa</p>
         )}
       </div>
     </div>

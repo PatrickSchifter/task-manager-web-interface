@@ -55,13 +55,13 @@ export default function NavbarComponent() {
     mutationFn: (payload: { currentPassword: string; newPassword: string }) =>
       changePassword(payload),
     onSuccess: () => {
-      addToast({ title: "Password updated successfully", color: "success" });
+      addToast({ title: "Senha atualizada com sucesso", color: "success" });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     },
     onError: () => {
-      addToast({ title: "Failed to update password", color: "danger" });
+      addToast({ title: "Falha ao atualizar senha", color: "danger" });
     },
   });
 
@@ -77,10 +77,10 @@ export default function NavbarComponent() {
         queryKey: ["auth", "me"],
         refetchType: "active",
       });
-      addToast({ title: "Avatar updated successfully", color: "success" });
+      addToast({ title: "Avatar atualizado com sucesso", color: "success" });
     },
     onError: () => {
-      addToast({ title: "Failed to upload avatar", color: "danger" });
+      addToast({ title: "Falha ao enviar avatar", color: "danger" });
     },
   });
 
@@ -131,7 +131,7 @@ export default function NavbarComponent() {
     try {
       localStorage.removeItem("token");
       queryClient.removeQueries({ type: "all" });
-      addToast({ title: "Signed out", color: "success" });
+      addToast({ title: "Desconectado", color: "success" });
     } finally {
       setIsLogged(false);
       navigate("/signin", { replace: true });
@@ -171,17 +171,17 @@ export default function NavbarComponent() {
                 src={typeof me?.avatar === "string" ? me?.avatar : undefined}
               />
             </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownMenu aria-label="Ações do Perfil" variant="flat">
               <DropdownItem key="profile" className="h-14 gap-2">
-                <p className="font-semibold">Signed in as</p>
+                <p className="font-semibold">Conectado como</p>
                 <p className="font-semibold">{me?.email ?? ""}</p>
               </DropdownItem>
-              <DropdownItem key="settings" onPress={settings.onOpen}>
-                My Settings
-              </DropdownItem>
-              <DropdownItem key="logout" color="danger" onPress={handleLogout}>
-                Log Out
-              </DropdownItem>
+<DropdownItem key="settings" onPress={settings.onOpen}>
+                  Minhas Configurações
+                </DropdownItem>
+                <DropdownItem key="logout" color="danger" onPress={handleLogout}>
+                  Sair
+                </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         ) : null}
@@ -199,7 +199,7 @@ export default function NavbarComponent() {
                 data-testid="my-settings-modal"
                 className="flex flex-col"
               >
-                My Settings
+                Minhas Configurações
               </ModalHeader>
               <ModalBody className="space-y-4">
                 <div className="space-y-2">
@@ -259,23 +259,23 @@ export default function NavbarComponent() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Change password</p>
+                  <p className="text-sm font-medium">Alterar senha</p>
                   <Input
-                    label="Current password"
+                    label="Senha atual"
                     type="password"
                     value={currentPassword}
                     onValueChange={setCurrentPassword}
                     data-testid="current-password-input"
                   />
                   <Input
-                    label="New password"
+                    label="Nova senha"
                     type="password"
                     value={newPassword}
                     onValueChange={setNewPassword}
                     data-testid="new-password-input"
                   />
                   <Input
-                    label="Confirm new password"
+                    label="Confirmar nova senha"
                     type="password"
                     value={confirmPassword}
                     onValueChange={setConfirmPassword}
@@ -283,7 +283,7 @@ export default function NavbarComponent() {
                   />
                   {confirmPassword && newPassword !== confirmPassword ? (
                     <p className="text-sm text-red-500">
-                      Passwords do not match.
+                      As senhas não coincidem.
                     </p>
                   ) : null}
                   <Button
@@ -300,13 +300,13 @@ export default function NavbarComponent() {
                       newPassword !== confirmPassword
                     }
                   >
-                    Save password
+                    Salvar senha
                   </Button>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={close}>
-                  Close
+                  Fechar
                 </Button>
               </ModalFooter>
             </>

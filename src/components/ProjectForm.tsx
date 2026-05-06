@@ -36,9 +36,9 @@ export default function ProjectForm({
           <>
             <ModalHeader className="flex flex-col">{title}</ModalHeader>
             <ModalBody className="space-y-3">
-              <Input label="Name" value={name} onValueChange={onNameChange} isRequired />
+              <Input label="Nome" value={name} onValueChange={onNameChange} isRequired />
               <Textarea
-                label="Description"
+                label="Descrição"
                 value={description}
                 onValueChange={onDescriptionChange}
                 minRows={3}
@@ -46,7 +46,7 @@ export default function ProjectForm({
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={close}>
-                Cancel
+                Cancelar
               </Button>
               <Button
                 color="primary"

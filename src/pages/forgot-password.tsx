@@ -28,28 +28,27 @@ export default function ForgotPasswordPage() {
         <img
           src="solut-tasks-logo.png"
           className="rounded-full w-70 m-auto"
-          alt="Solut Tasks Logo"
+          alt="Logo Solut Tasks"
         />
       </div>
       <section className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md">
           <CardHeader className="flex flex-col items-start gap-1">
-            <h1 className="text-xl font-semibold">Forgot your password?</h1>
+            <h1 className="text-xl font-semibold">Esqueceu sua senha?</h1>
             <p className="text-sm text-gray-500">
-              Enter your email and we'll send you a reset link
+              Digite seu e-mail que enviaremos um link de recuperação
             </p>
           </CardHeader>
           <CardBody className="space-y-4">
             {forgotPasswordMutation.isSuccess ? (
               <p className="text-sm text-green-600">
-                If an account with that email exists, you'll receive a password
-                reset link shortly.
+                Se existir uma conta com esse e-mail, você receberá um link de recuperação de senha em breve.
               </p>
             ) : (
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <Input
-                  label="Email"
-                  placeholder="you@example.com"
+                  label="E-mail"
+                  placeholder="seu@email.com"
                   type="email"
                   value={email}
                   onValueChange={setEmail}
@@ -63,20 +62,20 @@ export default function ForgotPasswordPage() {
                   isLoading={forgotPasswordMutation.isPending}
                 >
                   {forgotPasswordMutation.isPending
-                    ? "Sending..."
-                    : "Send reset link"}
+                    ? "Enviando..."
+                    : "Enviar link de recuperação"}
                 </Button>
               </form>
             )}
             {forgotPasswordMutation.isError ? (
               <p className="text-sm text-red-500">
-                Something went wrong. Please try again.
+                Algo deu errado. Tente novamente.
               </p>
             ) : null}
             <p className="text-sm text-gray-500">
-              Remembered your password?{" "}
+              Lembrou da sua senha?{" "}
               <Link className="text-primary" to="/signin">
-                Sign in
+                Entrar
               </Link>
             </p>
           </CardBody>
