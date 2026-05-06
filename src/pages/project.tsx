@@ -5,7 +5,6 @@ import {
   getProject,
   listMembers,
   listTasksByProject,
-  listUsers,
   updateProject,
 } from "@/api/client";
 import type {
@@ -87,14 +86,6 @@ export default function ProjectPage() {
     enabled: Boolean(projectId),
     staleTime: 30_000,
   });
-
-  const { data: usersResponse } = useQuery({
-    queryKey: ["users"],
-    queryFn: listUsers,
-    staleTime: 300_000, // 5 minutes
-  });
-
-  const users = usersResponse?.data ?? [];
 
   const tasks = tasksResponse?.data ?? [];
 
@@ -182,6 +173,8 @@ export default function ProjectPage() {
         description: description || undefined,
         status,
         priority,
+        assigneeId,
+        dueDate,
       }),
     onSuccess: async () => {
       setTitle("");
@@ -229,9 +222,6 @@ export default function ProjectPage() {
     if (presetStatus) setStatus(presetStatus);
     onOpen();
   }
-
-  const assignee = users.find((u) => u.id === assigneeId);
-  console.log("assignee", assignee);
 
   return (
     <DefaultLayout>
