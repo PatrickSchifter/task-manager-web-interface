@@ -344,58 +344,50 @@ export default function ProjectPage() {
                 <Select
                   label="Assignee"
                   placeholder="Select assignee"
-                  selectedKeys={assigneeId ? [assigneeId] : []}
-                  onChange={(e) => {
-                    setAssigneeId(e.target.value);
+                  selectedKeys={assigneeId ? [String(assigneeId)] : []}
+                  onSelectionChange={(keys) => {
+                    if (keys === "all") return;
+                    const value = Array.from(keys)[0];
+                    setAssigneeId(value ? String(value) : undefined);
                   }}
                   items={assigneeOptions}
-                  renderValue={(items) => {
-                    return items.map((item) => {
-                      const user = assigneeOptions.find(
-                        (u) => u.id === item.key,
-                      );
-
-                      return (
-                        <div className="flex items-center gap-2" key={item.key}>
-                          <Avatar
-                            size="sm"
-                            name={user?.name}
-                            src={
-                              typeof user?.avatar === "string"
-                                ? user.avatar
-                                : undefined
-                            }
-                            className="w-6 h-6"
-                          />
-                          <span>{user?.name}</span>
-                        </div>
-                      );
-                    });
-                  }}
+                  renderValue={(items) =>
+                    items.map((item) => (
+                      <div className="flex items-center gap-2" key={item.key}>
+                        <Avatar
+                          size="sm"
+                          name={item.data?.name}
+                          src={
+                            typeof item.data?.avatar === "string"
+                              ? item.data.avatar
+                              : undefined
+                          }
+                          className="w-6 h-6"
+                        />
+                        <span>{item.data?.name}</span>
+                      </div>
+                    ))
+                  }
                 >
-                  {assigneeOptions.map((user) => (
-                    <SelectItem key={user.id}>
+                  {(
+                    user, // 👈 muda para função que recebe o item
+                  ) => (
+                    <SelectItem key={String(user.id)} textValue={user.name}>
                       <div className="flex items-center gap-2">
-                        {user.id === "" ? (
-                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">?</span>
-                          </div>
-                        ) : (
-                          <Avatar
-                            size="sm"
-                            name={user.name}
-                            src={
-                              typeof user.avatar === "string"
-                                ? user.avatar
-                                : undefined
-                            }
-                            className="w-6 h-6"
-                          />
-                        )}
+                        <Avatar
+                          size="sm"
+                          name={user.name}
+                          src={
+                            typeof user.avatar === "string"
+                              ? user.avatar
+                              : undefined
+                          }
+                          className="w-6 h-6"
+                        />
                         <span>{user.name}</span>
                       </div>
                     </SelectItem>
-                  ))}
+                  )}
                 </Select>
               </ModalBody>
               <ModalFooter>

@@ -32,6 +32,7 @@ import {
 import { Select, SelectItem } from "@heroui/select";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useDrag } from "react-dnd";
 
@@ -45,6 +46,20 @@ type Props = {
   assignee?: { name: string; avatar?: string | null } | null;
 };
 
+function parseDateSafe(date?: unknown) {
+  if (typeof date !== "string" || date.trim() === "") return null;
+
+  try {
+    // Pega só a parte "YYYY-MM-DD", ignorando timezone da API
+    const dateOnly = date.split("T")[0];
+    const [year, month, day] = dateOnly.split("-").map(Number);
+    // Cria a data no horário local, sem conversão de timezone
+    return new Date(year, month - 1, day);
+  } catch {
+    return null;
+  }
+}
+
 const TaskCard = ({
   projectId,
   taskId,
@@ -54,6 +69,7 @@ const TaskCard = ({
   dueDate,
   assignee,
 }: Props) => {
+  console.log(dueDate);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const {
     isOpen: isDeleteOpen,
@@ -164,7 +180,9 @@ const TaskCard = ({
         setEditStatus(fullTask.status as string);
       }
       if (typeof fullTask.dueDate === "string") {
-        setEditDueDate(fullTask.dueDate);
+        const dateStr = (fullTask.dueDate as string).split("T")[0];
+        const [year, month, day] = dateStr.split("-");
+        setEditDueDate(`${year}-${month}-${day}`);
       }
       // Always sync assignee id (even if undefined)
       setEditAssigneeId(fullTask.assignee?.id ?? undefined);
@@ -179,7 +197,7 @@ const TaskCard = ({
         description: editDescription || undefined,
         priority: editPriority as TaskPriority,
         status: editStatus as TaskStatus,
-        dueDate: editDueDate ? new Date(editDueDate).toISOString() : undefined,
+        dueDate: editDueDate || undefined,
         assigneeId: editAssigneeId,
       }),
     onSuccess: async () => {
@@ -302,9 +320,9 @@ const TaskCard = ({
     setEditStatus(fullTask?.status || status);
     setEditDueDate(
       typeof fullTask?.dueDate === "string"
-        ? fullTask.dueDate
+        ? (fullTask.dueDate as string).split("T")[0]
         : typeof dueDate === "string"
-          ? dueDate
+          ? dueDate.split("T")[0]
           : undefined,
     );
     setEditAssigneeId(fullTask?.assignee?.id);
@@ -316,10 +334,6 @@ const TaskCard = ({
       setIsEditing(false);
     }
   }, [isOpen]);
-
-  const displayDue = dueDate
-    ? new Intl.DateTimeFormat("pt-BR").format(new Date(`${dueDate}T00:00:00`))
-    : undefined;
 
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
@@ -346,6 +360,23 @@ const TaskCard = ({
   const canDelete =
     currentMember &&
     (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
+
+  const dueDateValue = (fullTask?.dueDate ?? dueDate) as
+    | string
+    | null
+    | undefined;
+  const parsedDueDate = parseDateSafe(dueDateValue);
+  const displayDue = parsedDueDate
+    ? format(parsedDueDate, "dd/MM/yyyy")
+    : undefined;
+
+  const assigneeOptions = [
+    ...members.map((member) => ({
+      id: member.user.id,
+      name: member.user.name,
+      avatar: member.user.avatar,
+    })),
+  ];
 
   return (
     <>
@@ -476,37 +507,54 @@ const TaskCard = ({
                       <Select
                         label="Assignee"
                         placeholder="Select assignee"
-                        selectedKeys={editAssigneeId ? [editAssigneeId] : []}
+                        selectedKeys={
+                          editAssigneeId ? [String(editAssigneeId)] : []
+                        }
                         onSelectionChange={(keys) => {
-                          const selectedId = Array.from(keys)[0] as string;
-                          setEditAssigneeId(selectedId || undefined);
+                          if (keys === "all") return;
+                          const value = Array.from(keys)[0];
+                          setEditAssigneeId(value ? String(value) : undefined);
                         }}
-                        items={[
-                          { id: "", name: "Unassigned", avatar: null },
-                          ...users,
-                        ]}
+                        items={assigneeOptions}
+                        renderValue={(items) =>
+                          items.map((item) => (
+                            <div
+                              className="flex items-center gap-2"
+                              key={item.key}
+                            >
+                              <Avatar
+                                size="sm"
+                                name={item.data?.name}
+                                src={
+                                  typeof item.data?.avatar === "string"
+                                    ? item.data.avatar
+                                    : undefined
+                                }
+                                className="w-6 h-6"
+                              />
+                              <span>{item.data?.name}</span>
+                            </div>
+                          ))
+                        }
                       >
-                        {(user) => (
-                          <SelectItem key={user.id}>
+                        {(
+                          user, // 👈 muda para função que recebe o item
+                        ) => (
+                          <SelectItem
+                            key={String(user.id)}
+                            textValue={user.name}
+                          >
                             <div className="flex items-center gap-2">
-                              {user.id === "" ? (
-                                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <span className="text-xs text-gray-500">
-                                    ?
-                                  </span>
-                                </div>
-                              ) : (
-                                <Avatar
-                                  size="sm"
-                                  name={user.name}
-                                  src={
-                                    typeof user.avatar === "string"
-                                      ? user.avatar
-                                      : undefined
-                                  }
-                                  className="w-6 h-6"
-                                />
-                              )}
+                              <Avatar
+                                size="sm"
+                                name={user.name}
+                                src={
+                                  typeof user.avatar === "string"
+                                    ? user.avatar
+                                    : undefined
+                                }
+                                className="w-6 h-6"
+                              />
                               <span>{user.name}</span>
                             </div>
                           </SelectItem>
@@ -560,10 +608,7 @@ const TaskCard = ({
                             Due date
                           </h4>
                           <p className="mt-1 text-sm text-gray-900">
-                            {fullTask?.dueDate &&
-                            typeof fullTask.dueDate === "string"
-                              ? new Date(fullTask.dueDate).toLocaleDateString()
-                              : displayDue || "No due date"}
+                            {displayDue}
                           </p>
                         </div>
                         <div>

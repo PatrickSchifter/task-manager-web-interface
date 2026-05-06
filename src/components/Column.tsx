@@ -1,4 +1,8 @@
-import type { PaginatedResponse, TaskListItem, TaskRequest } from "@/api/client";
+import type {
+  PaginatedResponse,
+  TaskListItem,
+  TaskRequest,
+} from "@/api/client";
 import { updateTask } from "@/api/client";
 import { Card, CardBody } from "@heroui/card";
 import { addToast } from "@heroui/toast";
@@ -49,7 +53,9 @@ export default function Column({
                 return {
                   ...old,
                   data: old.data.map((t) =>
-                    t.id === item.taskId ? ({ ...t, status } as TaskListItem) : t,
+                    t.id === item.taskId
+                      ? ({ ...t, status } as TaskListItem)
+                      : t,
                   ),
                 };
               },
@@ -59,14 +65,18 @@ export default function Column({
               status,
               priority: task?.priority ?? "MEDIUM",
             });
-            await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "tasks"] });
+            await queryClient.invalidateQueries({
+              queryKey: ["projects", projectId, "tasks"],
+            });
             await queryClient.refetchQueries({
               queryKey: ["projects", projectId, "tasks"],
               type: "active",
             });
             addToast({ title: "Task moved", color: "success" });
           } catch {
-            await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "tasks"] });
+            await queryClient.invalidateQueries({
+              queryKey: ["projects", projectId, "tasks"],
+            });
             addToast({ title: "Failed to move task", color: "danger" });
           }
         })();
@@ -84,9 +94,12 @@ export default function Column({
   const normal = "border-gray-200 bg-gray-50";
   const hovering = "border-blue-300 bg-blue-50 ring-2 ring-blue-400";
   const dashed = !highlight && canDrop ? "border-dashed" : "";
-
   return (
-    <div ref={dropRef} className={`${base} ${highlight ? hovering : normal} ${dashed}`} data-testid={`column-${status}`}>
+    <div
+      ref={dropRef}
+      className={`${base} ${highlight ? hovering : normal} ${dashed}`}
+      data-testid={`column-${status}`}
+    >
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-gray-700">{title}</h2>
         <button
@@ -124,7 +137,10 @@ export default function Column({
                 t.assignee
                   ? {
                       name: t.assignee.name,
-                      avatar: typeof t.assignee.avatar === "string" ? t.assignee.avatar : null,
+                      avatar:
+                        typeof t.assignee.avatar === "string"
+                          ? t.assignee.avatar
+                          : null,
                     }
                   : null
               }
