@@ -8,7 +8,12 @@ import {
   listUsers,
   updateProject,
 } from "@/api/client";
-import type { MemberListItem, ProjectRequest, TaskListItem, TaskRequest } from "@/api/client";
+import type {
+  MemberListItem,
+  ProjectRequest,
+  TaskListItem,
+  TaskRequest,
+} from "@/api/client";
 import Column from "@/components/Column";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import MembersModal from "@/components/MembersModal";
@@ -120,11 +125,13 @@ export default function ProjectPage() {
   const members: MemberListItem[] = membersResponse?.data ?? [];
   const currentMember = user && members.find((m) => m.userId === user.id);
   const canAddTask =
-    currentMember && (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
+    currentMember &&
+    (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
 
   // Project edit mutation
   const editProjectMutation = useMutation({
-    mutationFn: (body: ProjectRequest) => updateProject(projectId as string, body),
+    mutationFn: (body: ProjectRequest) =>
+      updateProject(projectId as string, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
       onEditClose();
@@ -143,6 +150,14 @@ export default function ProjectPage() {
       navigate("/");
     },
   });
+
+  const assigneeOptions = [
+    ...members.map((member) => ({
+      id: member.user.id,
+      name: member.user.name,
+      avatar: member.user.avatar,
+    })),
+  ];
 
   const tasksByStatus = useMemo(() => {
     const map: Record<TaskStatus, TaskListItem[]> = {
@@ -174,7 +189,9 @@ export default function ProjectPage() {
       setStatus("TODO");
       setPriority("MEDIUM");
       onClose();
-      await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "tasks"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "tasks"],
+      });
       const { addToast } = await import("@heroui/toast");
       addToast({ title: "Task created successfully", color: "success" });
     },
@@ -188,7 +205,9 @@ export default function ProjectPage() {
   const handleEditProject = () => {
     if (project) {
       setEditName(project.name);
-      setEditDescription(typeof project.description === "string" ? project.description : "");
+      setEditDescription(
+        typeof project.description === "string" ? project.description : "",
+      );
       onEditOpen();
     }
   };
@@ -220,7 +239,9 @@ export default function ProjectPage() {
         <div className="mb-4 flex items-center justify-between px-2 mb-12">
           <div className="flex flex-col">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">{project?.name ?? "Project"}</h1>
+              <h1 className="text-xl font-semibold">
+                {project?.name ?? "Project"}
+              </h1>
               {isOwner && (
                 <div className="flex items-center gap-2">
                   <Button
@@ -246,7 +267,9 @@ export default function ProjectPage() {
               )}
             </div>
             <p className="text-sm text-gray-500">
-              {typeof project?.description === "string" ? project.description : ""}
+              {typeof project?.description === "string"
+                ? project.description
+                : ""}
             </p>
           </div>
           <div className="flex gap-2">
@@ -285,7 +308,12 @@ export default function ProjectPage() {
             <>
               <ModalHeader className="flex flex-col">Add task</ModalHeader>
               <ModalBody className="space-y-3">
-                <Input label="Title" value={title} onValueChange={setTitle} isRequired />
+                <Input
+                  label="Title"
+                  value={title}
+                  onValueChange={setTitle}
+                  isRequired
+                />
                 <Textarea
                   label="Description"
                   value={description}
@@ -295,7 +323,9 @@ export default function ProjectPage() {
                 <Select
                   label="Status"
                   selectedKeys={[status]}
-                  onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as TaskStatus)}
+                  onSelectionChange={(keys) =>
+                    setStatus(Array.from(keys)[0] as TaskStatus)
+                  }
                 >
                   <SelectItem key="TODO">To Do</SelectItem>
                   <SelectItem key="IN_PROGRESS">In Progress</SelectItem>
@@ -304,7 +334,9 @@ export default function ProjectPage() {
                 <Select
                   label="Priority"
                   selectedKeys={[priority]}
-                  onSelectionChange={(keys) => setPriority(Array.from(keys)[0] as TaskPriority)}
+                  onSelectionChange={(keys) =>
+                    setPriority(Array.from(keys)[0] as TaskPriority)
+                  }
                 >
                   <SelectItem key="LOW">Low</SelectItem>
                   <SelectItem key="MEDIUM">Medium</SelectItem>
@@ -326,7 +358,7 @@ export default function ProjectPage() {
                   onChange={(e) => {
                     setAssigneeId(e.target.value);
                   }}
-                  items={users}
+                  items={assigneeOptions}
                   renderValue={(items) => {
                     return items.map((item) => {
                       return (
@@ -335,7 +367,9 @@ export default function ProjectPage() {
                             size="sm"
                             name={item.data?.name}
                             src={
-                              typeof item.data?.avatar === "string" ? item.data.avatar : undefined
+                              typeof item.data?.avatar === "string"
+                                ? item.data.avatar
+                                : undefined
                             }
                             className="w-6 h-6"
                           />
@@ -345,7 +379,7 @@ export default function ProjectPage() {
                     });
                   }}
                 >
-                  {users.map((user) => (
+                  {assigneeOptions.map((user) => (
                     <SelectItem key={user.id}>
                       <div className="flex items-center gap-2">
                         {user.id === "" ? (
@@ -356,7 +390,11 @@ export default function ProjectPage() {
                           <Avatar
                             size="sm"
                             name={user.name}
-                            src={typeof user.avatar === "string" ? user.avatar : undefined}
+                            src={
+                              typeof user.avatar === "string"
+                                ? user.avatar
+                                : undefined
+                            }
                             className="w-6 h-6"
                           />
                         )}
