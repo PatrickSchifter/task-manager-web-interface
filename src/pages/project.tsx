@@ -351,19 +351,23 @@ export default function ProjectPage() {
                   items={assigneeOptions}
                   renderValue={(items) => {
                     return items.map((item) => {
+                      const user = assigneeOptions.find(
+                        (u) => u.id === item.key,
+                      );
+
                       return (
                         <div className="flex items-center gap-2" key={item.key}>
                           <Avatar
                             size="sm"
-                            name={item.data?.name}
+                            name={user?.name}
                             src={
-                              typeof item.data?.avatar === "string"
-                                ? item.data.avatar
+                              typeof user?.avatar === "string"
+                                ? user.avatar
                                 : undefined
                             }
                             className="w-6 h-6"
                           />
-                          <span>{item.data?.name}</span>
+                          <span>{user?.name}</span>
                         </div>
                       );
                     });
