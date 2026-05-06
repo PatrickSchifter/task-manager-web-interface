@@ -45,7 +45,15 @@ type Props = {
   assignee?: { name: string; avatar?: string | null } | null;
 };
 
-const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assignee }: Props) => {
+const TaskCard = ({
+  projectId,
+  taskId,
+  title,
+  priority,
+  status,
+  dueDate,
+  assignee,
+}: Props) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const {
     isOpen: isDeleteOpen,
@@ -65,7 +73,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
     mutationKey: ["projects", projectId, "tasks", taskId, "delete"],
     mutationFn: () => deleteTask(projectId, taskId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "tasks"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "tasks"],
+      });
       addToast({ title: "Task deleted successfully", color: "success" });
       onTaskDeleteClose();
       onClose();
@@ -129,13 +139,17 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
   const [editDueDate, setEditDueDate] = useState<string | undefined>(
     typeof dueDate === "string" ? dueDate : undefined,
   );
-  const [editAssigneeId, setEditAssigneeId] = useState<string | undefined>(undefined);
+  const [editAssigneeId, setEditAssigneeId] = useState<string | undefined>(
+    undefined,
+  );
 
   // Comment state
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
-  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null,
+  );
 
   // Sync modal fields with fullTask when modal opens or task changes
   useEffect(() => {
@@ -170,7 +184,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
       }),
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["projects", projectId, "tasks"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectId, "tasks"],
+        }),
         queryClient.invalidateQueries({
           queryKey: ["projects", projectId, "tasks", taskId, "details"],
         }),
@@ -186,7 +202,10 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
   // Create comment mutation
   const createCommentMutation = useMutation({
     mutationKey: ["projects", projectId, "tasks", taskId, "comments", "create"],
-    mutationFn: () => createComment(projectId, taskId, { content: newComment } as CommentRequest),
+    mutationFn: () =>
+      createComment(projectId, taskId, {
+        content: newComment,
+      } as CommentRequest),
     onSuccess: async () => {
       setNewComment("");
       await queryClient.invalidateQueries({
@@ -203,7 +222,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
   const updateCommentMutation = useMutation({
     mutationKey: ["projects", projectId, "tasks", taskId, "comments", "update"],
     mutationFn: (commentId: string) =>
-      updateComment(projectId, taskId, commentId, { content: editingContent } as CommentRequest),
+      updateComment(projectId, taskId, commentId, {
+        content: editingContent,
+      } as CommentRequest),
     onSuccess: async () => {
       setEditingCommentId(null);
       setEditingContent("");
@@ -220,7 +241,8 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
   // Delete comment mutation
   const deleteCommentMutation = useMutation({
     mutationKey: ["projects", projectId, "tasks", taskId, "comments", "delete"],
-    mutationFn: (commentId: string) => deleteComment(projectId, taskId, commentId),
+    mutationFn: (commentId: string) =>
+      deleteComment(projectId, taskId, commentId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks", taskId, "comments"],
@@ -273,7 +295,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
     setIsEditing(false);
     // Reset form fields to original values
     setEditTitle(fullTask?.title || title);
-    setEditDescription(typeof fullTask?.description === "string" ? fullTask.description : "");
+    setEditDescription(
+      typeof fullTask?.description === "string" ? fullTask.description : "",
+    );
     setEditPriority(fullTask?.priority || priority);
     setEditStatus(fullTask?.status || status);
     setEditDueDate(
@@ -293,7 +317,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
     }
   }, [isOpen]);
 
-  const displayDue = dueDate ? new Date(dueDate).toLocaleDateString() : undefined;
+  const displayDue = dueDate
+    ? new Intl.DateTimeFormat("pt-BR").format(new Date(`${dueDate}T00:00:00`))
+    : undefined;
 
   const [{ isDragging }, dragRef] = useDrag(
     () => ({
@@ -314,10 +340,12 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
   const members: MemberListItem[] = membersResponse?.data ?? [];
   const currentMember = user && members.find((m) => m.userId === user.id);
   const canEdit =
-    currentMember && (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
+    currentMember &&
+    (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
 
   const canDelete =
-    currentMember && (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
+    currentMember &&
+    (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
 
   return (
     <>
@@ -337,7 +365,11 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
             <Avatar
               size="sm"
               name={assignee?.name}
-              src={typeof assignee?.avatar === "string" ? assignee?.avatar : undefined}
+              src={
+                typeof assignee?.avatar === "string"
+                  ? assignee?.avatar
+                  : undefined
+              }
             />
           )}
         </CardFooter>
@@ -365,11 +397,15 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                       aria-label="Task title"
                     />
                   ) : (
-                    <h2 className="text-xl font-semibold">{fullTask?.title || title}</h2>
+                    <h2 className="text-xl font-semibold">
+                      {fullTask?.title || title}
+                    </h2>
                   )
                 ) : (
                   <div className="flex items-center justify-between w-full">
-                    <h2 className="text-xl font-semibold">{fullTask?.title || title}</h2>
+                    <h2 className="text-xl font-semibold">
+                      {fullTask?.title || title}
+                    </h2>
                     <div>
                       {canDelete && (
                         <Button
@@ -411,7 +447,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                       <Select
                         label="Priority"
                         selectedKeys={[editPriority]}
-                        onSelectionChange={(keys) => setEditPriority(Array.from(keys)[0] as string)}
+                        onSelectionChange={(keys) =>
+                          setEditPriority(Array.from(keys)[0] as string)
+                        }
                       >
                         <SelectItem key="LOW">Low</SelectItem>
                         <SelectItem key="MEDIUM">Medium</SelectItem>
@@ -420,7 +458,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                       <Select
                         label="Status"
                         selectedKeys={[editStatus]}
-                        onSelectionChange={(keys) => setEditStatus(Array.from(keys)[0] as string)}
+                        onSelectionChange={(keys) =>
+                          setEditStatus(Array.from(keys)[0] as string)
+                        }
                       >
                         <SelectItem key="TODO">To Do</SelectItem>
                         <SelectItem key="IN_PROGRESS">In Progress</SelectItem>
@@ -441,20 +481,29 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                           const selectedId = Array.from(keys)[0] as string;
                           setEditAssigneeId(selectedId || undefined);
                         }}
-                        items={[{ id: "", name: "Unassigned", avatar: null }, ...users]}
+                        items={[
+                          { id: "", name: "Unassigned", avatar: null },
+                          ...users,
+                        ]}
                       >
                         {(user) => (
                           <SelectItem key={user.id}>
                             <div className="flex items-center gap-2">
                               {user.id === "" ? (
                                 <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <span className="text-xs text-gray-500">?</span>
+                                  <span className="text-xs text-gray-500">
+                                    ?
+                                  </span>
                                 </div>
                               ) : (
                                 <Avatar
                                   size="sm"
                                   name={user.name}
-                                  src={typeof user.avatar === "string" ? user.avatar : undefined}
+                                  src={
+                                    typeof user.avatar === "string"
+                                      ? user.avatar
+                                      : undefined
+                                  }
                                   className="w-6 h-6"
                                 />
                               )}
@@ -472,7 +521,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                       <div className="md:col-span-2 space-y-4">
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700">Description</h4>
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Description
+                          </h4>
                           <p className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">
                             {typeof fullTask?.description === "string" &&
                             (fullTask.description as string).trim()
@@ -483,13 +534,17 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                       </div>
                       <div className="md:col-span-1 space-y-4">
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700">Priority</h4>
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Priority
+                          </h4>
                           <p className="mt-1 text-sm text-gray-900">
                             {fullTask?.priority || priority}
                           </p>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700">Status</h4>
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Status
+                          </h4>
                           <p className="mt-1 text-sm text-gray-900">
                             {fullTask?.status === "TODO"
                               ? "To Do"
@@ -501,23 +556,30 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                           </p>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700">Due date</h4>
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Due date
+                          </h4>
                           <p className="mt-1 text-sm text-gray-900">
-                            {fullTask?.dueDate && typeof fullTask.dueDate === "string"
+                            {fullTask?.dueDate &&
+                            typeof fullTask.dueDate === "string"
                               ? new Date(fullTask.dueDate).toLocaleDateString()
                               : displayDue || "No due date"}
                           </p>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-gray-700">Assignee</h4>
+                          <h4 className="text-sm font-medium text-gray-700">
+                            Assignee
+                          </h4>
                           {fullTask?.assignee || assignee ? (
                             <div className="mt-1 flex items-center gap-2">
                               <Avatar
                                 size="sm"
                                 name={(fullTask?.assignee || assignee)?.name}
                                 src={
-                                  typeof (fullTask?.assignee || assignee)?.avatar === "string"
-                                    ? ((fullTask?.assignee || assignee)?.avatar as string)
+                                  typeof (fullTask?.assignee || assignee)
+                                    ?.avatar === "string"
+                                    ? ((fullTask?.assignee || assignee)
+                                        ?.avatar as string)
                                     : undefined
                                 }
                               />
@@ -526,7 +588,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                               </span>
                             </div>
                           ) : (
-                            <p className="mt-1 text-sm text-gray-500">Unassigned</p>
+                            <p className="mt-1 text-sm text-gray-500">
+                              Unassigned
+                            </p>
                           )}
                         </div>
                       </div>
@@ -560,7 +624,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                         ) : comments.length === 0 ? (
                           <div className="text-center py-4 text-gray-500">
                             <p>No comments yet</p>
-                            <p className="text-sm">Be the first to add a comment!</p>
+                            <p className="text-sm">
+                              Be the first to add a comment!
+                            </p>
                           </div>
                         ) : (
                           comments.map((comment) => (
@@ -572,14 +638,17 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                                       size="sm"
                                       name={comment.author.name}
                                       src={
-                                        typeof comment.author.avatar === "string"
+                                        typeof comment.author.avatar ===
+                                        "string"
                                           ? comment.author.avatar
                                           : undefined
                                       }
                                       className="w-8 h-8"
                                     />
                                     <div>
-                                      <p className="font-medium text-sm">{comment.author.name}</p>
+                                      <p className="font-medium text-sm">
+                                        {comment.author.name}
+                                      </p>
                                       <p className="text-xs text-gray-500">
                                         {formatDate(comment.createdAt)}
                                       </p>
@@ -592,7 +661,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                                         size="sm"
                                         variant="light"
                                         data-testid="btn-edit-comment"
-                                        onPress={() => handleEditComment(comment)}
+                                        onPress={() =>
+                                          handleEditComment(comment)
+                                        }
                                         className="text-gray-500 hover:text-blue-600"
                                       >
                                         <EditIcon size={14} />
@@ -602,7 +673,9 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                                         size="sm"
                                         variant="light"
                                         data-testid="btn-delete-comment"
-                                        onPress={() => handleDeleteComment(comment.id)}
+                                        onPress={() =>
+                                          handleDeleteComment(comment.id)
+                                        }
                                         className="text-gray-500 hover:text-red-600"
                                       >
                                         <DeleteIcon size={14} />
@@ -622,19 +695,31 @@ const TaskCard = ({ projectId, taskId, title, priority, status, dueDate, assigne
                                       <Button
                                         size="sm"
                                         color="primary"
-                                        onPress={() => updateCommentMutation.mutate(comment.id)}
-                                        isLoading={updateCommentMutation.isPending}
+                                        onPress={() =>
+                                          updateCommentMutation.mutate(
+                                            comment.id,
+                                          )
+                                        }
+                                        isLoading={
+                                          updateCommentMutation.isPending
+                                        }
                                         isDisabled={!editingContent.trim()}
                                       >
                                         Save
                                       </Button>
-                                      <Button size="sm" variant="light" onPress={handleCancelEdit}>
+                                      <Button
+                                        size="sm"
+                                        variant="light"
+                                        onPress={handleCancelEdit}
+                                      >
                                         Cancel
                                       </Button>
                                     </div>
                                   </div>
                                 ) : (
-                                  <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
+                                  <p className="text-sm whitespace-pre-wrap">
+                                    {comment.content}
+                                  </p>
                                 )}
                               </CardBody>
                             </Card>
