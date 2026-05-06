@@ -11,7 +11,6 @@ import {
   getTask,
   listCommentsByTask,
   listMembers,
-  listUsers,
   updateComment,
   updateTask,
 } from "@/api/client";
@@ -138,15 +137,6 @@ const TaskCard = ({
   });
 
   const comments: CommentListItem[] = commentsResponse?.data ?? [];
-
-  // Fetch users for assignee selection
-  const { data: usersResponse } = useQuery({
-    queryKey: ["users"],
-    queryFn: listUsers,
-    staleTime: 300_000, // 5 minutes
-  });
-
-  const users = usersResponse?.data ?? [];
 
   const [editTitle, setEditTitle] = useState<string>(title);
   const [editDescription, setEditDescription] = useState<string>("");
