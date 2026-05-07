@@ -20,6 +20,7 @@ type ColumnProps = {
   tasks: TaskListItem[];
   allTasks: TaskListItem[];
   onAddTask: (status: TaskStatus) => void;
+  mobileView?: boolean;
 };
 
 export default function Column({
@@ -30,6 +31,7 @@ export default function Column({
   tasks,
   allTasks,
   onAddTask,
+  mobileView = false,
 }: ColumnProps) {
   const queryClient = useQueryClient();
 
@@ -45,7 +47,6 @@ export default function Column({
         (async () => {
           try {
             const task = allTasks.find((t) => t.id === item.taskId);
-            // Optimistic update
             queryClient.setQueryData<PaginatedResponse<TaskListItem>>(
               ["projects", projectId, "tasks"],
               (old) => {
@@ -89,11 +90,74 @@ export default function Column({
     [projectId, status, allTasks],
   );
 
+  // ── Mobile view ───────────────────────────────────────────────
+  if (mobileView) {
+    return (
+      <div className="w-full" data-testid={`column-${status}`}>
+        <div className="space-y-3">
+          {isLoading ? (
+            [0, 1, 2].map((i) => (
+              <Card
+                key={`${status}-skeleton-${i}`}
+                className="w-full rounded-xl border border-gray-200 bg-white"
+              >
+                <CardBody className="p-4">
+                  <div className="mb-2 h-4 w-2/3 rounded bg-gray-200" />
+                  <div className="h-3 w-5/6 rounded bg-gray-100" />
+                </CardBody>
+              </Card>
+            ))
+          ) : tasks.length ? (
+            tasks.map((t) => (
+              <TaskCard
+                key={t.id}
+                projectId={projectId}
+                taskId={t.id}
+                title={t.title}
+                priority={t.priority}
+                status={t.status}
+                dueDate={typeof t.dueDate === "string" ? t.dueDate : undefined}
+                assignee={
+                  t.assignee
+                    ? {
+                        name: t.assignee.name,
+                        avatar:
+                          typeof t.assignee.avatar === "string"
+                            ? t.assignee.avatar
+                            : null,
+                      }
+                    : null
+                }
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+              <span className="mb-2 text-3xl">📋</span>
+              <p className="text-sm">Nenhuma tarefa aqui</p>
+            </div>
+          )}
+        </div>
+
+        {/* Inline add button */}
+        <button
+          type="button"
+          onClick={() => onAddTask(status)}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <span className="text-lg leading-none">+</span>
+          Adicionar tarefa
+        </button>
+      </div>
+    );
+  }
+
+  // ── Desktop view (original behaviour) ────────────────────────
   const highlight = isOver && canDrop;
   const base = "w-[32%] flex-shrink-0 rounded-lg border p-3 transition-colors";
   const normal = "border-gray-200 bg-gray-50";
   const hovering = "border-blue-300 bg-blue-50 ring-2 ring-blue-400";
   const dashed = !highlight && canDrop ? "border-dashed" : "";
+
   return (
     <div
       ref={dropRef}

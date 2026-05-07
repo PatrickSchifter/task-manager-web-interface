@@ -29,7 +29,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
-import { Avatar } from "@heroui/react";
+import { Avatar, Chip, Tab, Tabs } from "@heroui/react";
 import { Select, SelectItem } from "@heroui/select";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -68,6 +68,9 @@ export default function ProjectPage() {
     onOpenChange: onMembersOpenChange,
   } = useDisclosure();
 
+  // Mobile tab state
+  const [activeTab, setActiveTab] = useState<TaskStatus>("TODO");
+
   // Task form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -96,17 +99,14 @@ export default function ProjectPage() {
     staleTime: 60_000,
   });
 
-  // Get current user to check ownership
   const { data: user } = useQuery({
     queryKey: ["auth", "me"],
     queryFn: getMe,
-    staleTime: 300_000, // 5 minutes
+    staleTime: 300_000,
   });
 
   const isOwner = user?.id === project?.createdById;
-  console.log("isOwner", isOwner);
 
-  // Fetch project members to check user role
   const { data: membersResponse } = useQuery({
     queryKey: ["projects", projectId, "members"],
     queryFn: () => listMembers(projectId as string),
@@ -119,7 +119,6 @@ export default function ProjectPage() {
     currentMember &&
     (currentMember.role === "EDITOR" || currentMember.role === "OWNER");
 
-  // Project edit mutation
   const editProjectMutation = useMutation({
     mutationFn: (body: ProjectRequest) =>
       updateProject(projectId as string, body),
@@ -132,7 +131,6 @@ export default function ProjectPage() {
     },
   });
 
-  // Project delete mutation
   const deleteProjectMutation = useMutation({
     mutationFn: () => deleteProject(projectId as string),
     onSuccess: () => {
@@ -142,13 +140,11 @@ export default function ProjectPage() {
     },
   });
 
-  const assigneeOptions = [
-    ...members.map((member) => ({
-      id: member.user.id,
-      name: member.user.name,
-      avatar: member.user.avatar,
-    })),
-  ];
+  const assigneeOptions = members.map((member) => ({
+    id: member.user.id,
+    name: member.user.name,
+    avatar: member.user.avatar,
+  }));
 
   const tasksByStatus = useMemo(() => {
     const map: Record<TaskStatus, TaskListItem[]> = {
@@ -162,8 +158,6 @@ export default function ProjectPage() {
     }
     return map;
   }, [tasks]);
-
-  // Column drop logic moved into Column component
 
   const createTaskMutation = useMutation({
     mutationKey: ["projects", projectId, "tasks", "create"],
@@ -194,7 +188,6 @@ export default function ProjectPage() {
     },
   });
 
-  // Handler for opening edit modal and initializing form
   const handleEditProject = () => {
     if (project) {
       setEditName(project.name);
@@ -205,7 +198,6 @@ export default function ProjectPage() {
     }
   };
 
-  // Handler for submitting project edit
   const handleEditSubmit = () => {
     editProjectMutation.mutate({
       name: editName,
@@ -213,7 +205,6 @@ export default function ProjectPage() {
     });
   };
 
-  // Handler for confirming project deletion
   const handleDeleteProject = () => {
     deleteProjectMutation.mutate();
   };
@@ -225,19 +216,29 @@ export default function ProjectPage() {
 
   return (
     <DefaultLayout>
-      <section className="py-8 md:py-10">
-        <div className="mb-4 flex items-center justify-between px-2 mb-12">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold">
+      <section className="py-4 md:py-10">
+        {/* ── Header ── */}
+        <div className="px-4 md:px-2 mb-6 md:mb-12">
+          {/* Mobile header */}
+          <div className="flex items-start justify-between md:hidden mb-3">
+            <div className="flex-1 min-w-0 pr-3">
+              <h1 className="text-lg font-semibold truncate">
                 {project?.name ?? "Projeto"}
               </h1>
+              {typeof project?.description === "string" &&
+                project.description && (
+                  <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">
+                    {project.description}
+                  </p>
+                )}
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
               {isOwner && (
-                <div className="flex items-center gap-2">
+                <>
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
+                    variant="flat"
                     onPress={handleEditProject}
                     aria-label="Editar projeto"
                   >
@@ -246,37 +247,128 @@ export default function ProjectPage() {
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
+                    variant="flat"
                     color="danger"
                     onPress={onDeleteOpen}
                     aria-label="Excluir projeto"
                   >
                     <DeleteIcon className="h-4 w-4" />
                   </Button>
-                </div>
+                </>
               )}
             </div>
-            <p className="text-sm text-gray-500">
-              {typeof project?.description === "string"
-                ? project.description
-                : ""}
-            </p>
           </div>
-          <div className="flex gap-2">
+
+          {/* Mobile: members row + action buttons */}
+          <div className="flex items-center justify-between md:hidden">
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onKeyDown={isOwner ? onMembersOpen : undefined}
+              role={isOwner ? "button" : undefined}
+              aria-label={isOwner ? "Gerenciar colaboradores" : undefined}
+            >
+              <div className="flex">
+                {members.slice(0, 4).map((m, i) => (
+                  <Avatar
+                    key={m.userId}
+                    size="sm"
+                    name={m.user.name}
+                    src={
+                      typeof m.user.avatar === "string"
+                        ? m.user.avatar
+                        : undefined
+                    }
+                    className="w-7 h-7 text-xs ring-2 ring-background"
+                    style={{
+                      marginLeft: i === 0 ? 0 : -8,
+                      zIndex: members.length - i,
+                    }}
+                  />
+                ))}
+                {members.length > 4 && (
+                  <div
+                    className="w-7 h-7 rounded-full bg-default-100 ring-2 ring-background flex items-center justify-center text-xs text-default-500 font-medium"
+                    style={{ marginLeft: -8 }}
+                  >
+                    +{members.length - 4}
+                  </div>
+                )}
+              </div>
+              <span className="text-xs text-gray-500">
+                {members.length} colaborador{members.length !== 1 ? "es" : ""}
+              </span>
+            </div>
+
             {canAddTask && (
-              <Button color="primary" onPress={() => openAddTask("TODO")}>
-                Adicionar tarefa
+              <Button
+                size="sm"
+                color="primary"
+                onPress={() => openAddTask(activeTab)}
+                startContent={<span className="text-base leading-none">+</span>}
+              >
+                Tarefa
               </Button>
             )}
-            {isOwner && (
-              <Button color="secondary" variant="flat" onPress={onMembersOpen}>
-                Colaboradores
-              </Button>
-            )}
+          </div>
+
+          {/* Desktop header (unchanged layout) */}
+          <div className="hidden md:flex items-center justify-between">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-3">
+                <h1 className="text-xl font-semibold">
+                  {project?.name ?? "Projeto"}
+                </h1>
+                {isOwner && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      onPress={handleEditProject}
+                      aria-label="Editar projeto"
+                    >
+                      <EditIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color="danger"
+                      onPress={onDeleteOpen}
+                      aria-label="Excluir projeto"
+                    >
+                      <DeleteIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-gray-500">
+                {typeof project?.description === "string"
+                  ? project.description
+                  : ""}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {canAddTask && (
+                <Button color="primary" onPress={() => openAddTask("TODO")}>
+                  Adicionar tarefa
+                </Button>
+              )}
+              {isOwner && (
+                <Button
+                  color="secondary"
+                  variant="flat"
+                  onPress={onMembersOpen}
+                >
+                  Colaboradores
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-6 px-2">
+        {/* ── Desktop: kanban columns ── */}
+        <div className="hidden md:flex gap-6 px-2">
           {(Object.keys(STATUS_LABEL) as TaskStatus[]).map((s) => (
             <Column
               key={s}
@@ -290,13 +382,71 @@ export default function ProjectPage() {
             />
           ))}
         </div>
+
+        {/* ── Mobile: tabs + single column ── */}
+        <div className="md:hidden">
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={(key) => setActiveTab(key as TaskStatus)}
+            variant="underlined"
+            classNames={{
+              base: "w-full px-4",
+              tabList: "w-full gap-0 border-b border-divider pb-0",
+              tab: "flex-1 h-10",
+              cursor: "bg-primary",
+            }}
+          >
+            {(Object.keys(STATUS_LABEL) as TaskStatus[]).map((s) => (
+              <Tab
+                key={s}
+                title={
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">{STATUS_LABEL[s]}</span>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      classNames={{
+                        base: "h-4 min-w-unit-4 px-1",
+                        content: "text-xs leading-none p-0",
+                      }}
+                    >
+                      {tasksByStatus[s].length}
+                    </Chip>
+                  </div>
+                }
+              />
+            ))}
+          </Tabs>
+
+          <div className="px-4 pt-4">
+            <Column
+              key={activeTab}
+              projectId={projectId as string}
+              status={activeTab}
+              title={STATUS_LABEL[activeTab]}
+              isLoading={isLoading}
+              tasks={tasksByStatus[activeTab]}
+              allTasks={tasks}
+              onAddTask={openAddTask}
+              mobileView
+            />
+          </div>
+        </div>
       </section>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+      {/* ── Add Task Modal ── */}
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="bottom-center"
+        className="md:placement-center"
+      >
         <ModalContent>
           {(close) => (
             <>
-              <ModalHeader className="flex flex-col">Adicionar tarefa</ModalHeader>
+              <ModalHeader className="flex flex-col">
+                Adicionar tarefa
+              </ModalHeader>
               <ModalBody className="space-y-3">
                 <Input
                   label="Título"
@@ -336,7 +486,7 @@ export default function ProjectPage() {
                 <Input
                   type="date"
                   label="Data de entrega"
-                  placeholder="DD/MM/AAAA HH:mm"
+                  placeholder="DD/MM/AAAA"
                   value={dueDate ?? ""}
                   onChange={(e) => setDueDate(e.target.value)}
                 />
@@ -369,22 +519,20 @@ export default function ProjectPage() {
                     ))
                   }
                 >
-                  {(
-                    user, // 👈 muda para função que recebe o item
-                  ) => (
-                    <SelectItem key={String(user.id)} textValue={user.name}>
+                  {(member) => (
+                    <SelectItem key={String(member.id)} textValue={member.name}>
                       <div className="flex items-center gap-2">
                         <Avatar
                           size="sm"
-                          name={user.name}
+                          name={member.name}
                           src={
-                            typeof user.avatar === "string"
-                              ? user.avatar
+                            typeof member.avatar === "string"
+                              ? member.avatar
                               : undefined
                           }
                           className="w-6 h-6"
                         />
-                        <span>{user.name}</span>
+                        <span>{member.name}</span>
                       </div>
                     </SelectItem>
                   )}
@@ -408,7 +556,7 @@ export default function ProjectPage() {
         </ModalContent>
       </Modal>
 
-      {/* Edit Project Modal */}
+      {/* ── Edit Project Modal ── */}
       <ProjectForm
         isOpen={isEditOpen}
         onOpenChange={onEditOpenChange}
@@ -423,7 +571,7 @@ export default function ProjectPage() {
         project={project}
       />
 
-      {/* Delete Project Confirmation Modal */}
+      {/* ── Delete Confirmation Modal ── */}
       <ConfirmationModal
         isOpen={isDeleteOpen}
         onOpenChange={onDeleteOpenChange}
@@ -436,7 +584,7 @@ export default function ProjectPage() {
         isLoading={deleteProjectMutation.isPending}
       />
 
-      {/* Members Modal */}
+      {/* ── Members Modal ── */}
       {projectId && (
         <MembersModal
           isOpen={isMembersOpen}
