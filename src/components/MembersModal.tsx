@@ -60,10 +60,18 @@ export default function MembersModal({
   } = useDisclosure();
 
   const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const [selectedRole, setSelectedRole] = useState<"VIEWER" | "EDITOR" | "OWNER">("EDITOR");
-  const [memberToRemove, setMemberToRemove] = useState<MemberListItem | null>(null);
-  const [editingMember, setEditingMember] = useState<MemberListItem | null>(null);
-  const [newRole, setNewRole] = useState<"VIEWER" | "EDITOR" | "OWNER">("EDITOR");
+  const [selectedRole, setSelectedRole] = useState<
+    "VIEWER" | "EDITOR" | "OWNER"
+  >("EDITOR");
+  const [memberToRemove, setMemberToRemove] = useState<MemberListItem | null>(
+    null,
+  );
+  const [editingMember, setEditingMember] = useState<MemberListItem | null>(
+    null,
+  );
+  const [newRole, setNewRole] = useState<"VIEWER" | "EDITOR" | "OWNER">(
+    "EDITOR",
+  );
 
   // Fetch members
   const { data: membersResponse, isLoading: isLoadingMembers } = useQuery({
@@ -88,11 +96,16 @@ export default function MembersModal({
   const addMemberMutation = useMutation({
     mutationFn: (body: AddMemberDto) => addMember(projectId, body),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "members"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"],
+      });
       setSelectedUserId("");
       setSelectedRole("EDITOR");
       onAddClose();
-      addToast({ title: "Colaborador adicionado com sucesso", color: "success" });
+      addToast({
+        title: "Colaborador adicionado com sucesso",
+        color: "success",
+      });
     },
     onError: async () => {
       addToast({ title: "Falha ao adicionar colaborador", color: "danger" });
@@ -101,15 +114,28 @@ export default function MembersModal({
 
   // Update role mutation
   const updateRoleMutation = useMutation({
-    mutationFn: ({ userId, body }: { userId: string; body: UpdateMemberRoleDto }) =>
-      updateMemberRole(projectId, userId, body),
+    mutationFn: ({
+      userId,
+      body,
+    }: {
+      userId: string;
+      body: UpdateMemberRoleDto;
+    }) => updateMemberRole(projectId, userId, body),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "members"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"],
+      });
       setEditingMember(null);
-      addToast({ title: "Função do membro atualizada com sucesso", color: "success" });
+      addToast({
+        title: "Função do membro atualizada com sucesso",
+        color: "success",
+      });
     },
     onError: async () => {
-      addToast({ title: "Falha ao atualizar função do membro", color: "danger" });
+      addToast({
+        title: "Falha ao atualizar função do membro",
+        color: "danger",
+      });
     },
   });
 
@@ -117,7 +143,9 @@ export default function MembersModal({
   const removeMemberMutation = useMutation({
     mutationFn: (userId: string) => removeMember(projectId, userId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["projects", projectId, "members"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "members"],
+      });
       setMemberToRemove(null);
       onRemoveClose();
       addToast({ title: "Colaborador removido com sucesso", color: "success" });
@@ -160,7 +188,12 @@ export default function MembersModal({
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="2xl"
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -218,7 +251,9 @@ export default function MembersModal({
                   ) : members.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <p>Nenhum membro encontrado</p>
-                      <p className="text-sm">Adicione membros para começar a colaborar</p>
+                      <p className="text-sm">
+                        Adicione membros para começar a colaborar
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -237,8 +272,12 @@ export default function MembersModal({
                                   }
                                 />
                                 <div>
-                                  <p className="font-medium">{member.user.name}</p>
-                                  <p className="text-sm text-gray-500">{member.user.email}</p>
+                                  <p className="font-medium">
+                                    {member.user.name} - {member.user.email}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {member.user.email}
+                                  </p>
                                 </div>
                               </div>
 
@@ -252,7 +291,11 @@ export default function MembersModal({
                                         : "bg-gray-100 text-gray-800"
                                   }`}
                                 >
-                                  {ROLE_LABELS[member.role as keyof typeof ROLE_LABELS]}
+                                  {
+                                    ROLE_LABELS[
+                                      member.role as keyof typeof ROLE_LABELS
+                                    ]
+                                  }
                                 </span>
 
                                 {/* Only owners can edit/remove members, and can't remove themselves */}
@@ -310,7 +353,9 @@ export default function MembersModal({
                   placeholder="Escolha um usuário para adicionar"
                   data-testid="choose-user-select"
                   selectedKeys={selectedUserId ? [selectedUserId] : []}
-                  onSelectionChange={(keys) => setSelectedUserId(Array.from(keys)[0] as string)}
+                  onSelectionChange={(keys) =>
+                    setSelectedUserId(Array.from(keys)[0] as string)
+                  }
                   description="Selecione um usuário da lista abaixo"
                 >
                   {availableUsers.map((user) => (
@@ -323,7 +368,11 @@ export default function MembersModal({
                         <Avatar
                           size="sm"
                           name={user.name}
-                          src={typeof user.avatar === "string" ? user.avatar : undefined}
+                          src={
+                            typeof user.avatar === "string"
+                              ? user.avatar
+                              : undefined
+                          }
                           className="w-6 h-6"
                         />
                         <div>
@@ -339,13 +388,20 @@ export default function MembersModal({
                   label="Função"
                   selectedKeys={[selectedRole]}
                   onSelectionChange={(keys) =>
-                    setSelectedRole(Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER")
+                    setSelectedRole(
+                      Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER",
+                    )
                   }
                 >
-                  <SelectItem key="VIEWER">Visualizador - Pode visualizar projeto e tarefas</SelectItem>
-                  <SelectItem key="EDITOR">Editor - Pode criar e editar tarefas</SelectItem>
+                  <SelectItem key="VIEWER">
+                    Visualizador - Pode visualizar projeto e tarefas
+                  </SelectItem>
+                  <SelectItem key="EDITOR">
+                    Editor - Pode criar e editar tarefas
+                  </SelectItem>
                   <SelectItem key="OWNER">
-                    Proprietário - Acesso completo incluindo gerenciamento de membros
+                    Proprietário - Acesso completo incluindo gerenciamento de
+                    membros
                   </SelectItem>
                 </Select>
               </ModalBody>
@@ -370,7 +426,10 @@ export default function MembersModal({
 
       {/* Edit Role Modal */}
       {editingMember && (
-        <Modal isOpen={!!editingMember} onOpenChange={(open) => !open && setEditingMember(null)}>
+        <Modal
+          isOpen={!!editingMember}
+          onOpenChange={(open) => !open && setEditingMember(null)}
+        >
           <ModalContent>
             {(onClose) => (
               <>
@@ -388,7 +447,9 @@ export default function MembersModal({
                     />
                     <div>
                       <p className="font-medium">{editingMember.user.name}</p>
-                      <p className="text-sm text-gray-500">{editingMember.user.email}</p>
+                      <p className="text-sm text-gray-500">
+                        {editingMember.user.email}
+                      </p>
                     </div>
                   </div>
 
@@ -396,13 +457,20 @@ export default function MembersModal({
                     label="Nova Função"
                     selectedKeys={[newRole]}
                     onSelectionChange={(keys) =>
-                      setNewRole(Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER")
+                      setNewRole(
+                        Array.from(keys)[0] as "VIEWER" | "EDITOR" | "OWNER",
+                      )
                     }
                   >
-                    <SelectItem key="VIEWER">Visualizador - Pode visualizar projeto e tarefas</SelectItem>
-                    <SelectItem key="EDITOR">Editor - Pode criar e editar tarefas</SelectItem>
+                    <SelectItem key="VIEWER">
+                      Visualizador - Pode visualizar projeto e tarefas
+                    </SelectItem>
+                    <SelectItem key="EDITOR">
+                      Editor - Pode criar e editar tarefas
+                    </SelectItem>
                     <SelectItem key="OWNER">
-                      Proprietário - Acesso completo incluindo gerenciamento de membros
+                      Proprietário - Acesso completo incluindo gerenciamento de
+                      membros
                     </SelectItem>
                   </Select>
                 </ModalBody>
