@@ -49,6 +49,9 @@ export default function NavbarComponent() {
   }, [me]);
   const settings = useDisclosure();
   const queryClient = useQueryClient();
+  const [avatarCacheBust, setAvatarCacheBust] = React.useState(() =>
+    Date.now(),
+  );
 
   const passwordMutation = useMutation({
     mutationKey: ["auth", "change-password"],
@@ -69,6 +72,7 @@ export default function NavbarComponent() {
     mutationKey: ["auth", "upload-avatar"],
     mutationFn: (file: File) => uploadAvatar(file),
     onSuccess: async () => {
+      setAvatarCacheBust(Date.now());
       await queryClient.removeQueries({
         queryKey: ["auth", "me"],
         type: "all",
@@ -176,7 +180,11 @@ export default function NavbarComponent() {
                 color="secondary"
                 name={me?.name ?? "User"}
                 size="sm"
-                src={typeof me?.avatar === "string" ? me?.avatar : undefined}
+                src={
+                  typeof me?.avatar === "string"
+                    ? `${me.avatar}?t=${avatarCacheBust}`
+                    : undefined
+                }
               />
             </DropdownTrigger>
             <DropdownMenu aria-label="Ações do Perfil" variant="flat">
