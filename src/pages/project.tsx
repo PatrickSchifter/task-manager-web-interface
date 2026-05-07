@@ -263,8 +263,10 @@ export default function ProjectPage() {
           <div className="flex items-center justify-between md:hidden">
             <div
               className="flex items-center gap-2 cursor-pointer"
+              onClick={isOwner ? onMembersOpen : undefined}
               onKeyDown={isOwner ? onMembersOpen : undefined}
               role={isOwner ? "button" : undefined}
+              tabIndex={isOwner ? 0 : undefined}
               aria-label={isOwner ? "Gerenciar colaboradores" : undefined}
             >
               <div className="flex">
