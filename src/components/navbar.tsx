@@ -93,8 +93,12 @@ export default function NavbarComponent() {
 
   function onSelectAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    e.currentTarget.value = ""; // limpa antes de usar a variável local
-    if (file) avatarMutation.mutate(file);
+    if (!file) return;
+
+    // Cria uma cópia do arquivo antes de limpar o input
+    const fileCopy = new File([file], file.name, { type: file.type });
+    e.currentTarget.value = "";
+    avatarMutation.mutate(fileCopy);
   }
 
   const [currentPassword, setCurrentPassword] = React.useState("");
