@@ -219,7 +219,10 @@ const TaskCard = ({
       await queryClient.invalidateQueries({
         queryKey: ["projects", projectId, "tasks", taskId, "comments"],
       });
-      addToast({ title: "Comentário adicionado com sucesso", color: "success" });
+      addToast({
+        title: "Comentário adicionado com sucesso",
+        color: "success",
+      });
     },
     onError: () => {
       addToast({ title: "Falha ao adicionar comentário", color: "danger" });
@@ -378,7 +381,7 @@ const TaskCard = ({
         style={{ opacity: isDragging ? 0.5 : 1 }}
       >
         <CardHeader className="pb-1">
-          <h3 className="text-sm font-medium">{title}</h3>
+          <h3 className="text-sm font-medium text-left">{title}</h3>
         </CardHeader>
         <CardFooter className="flex items-center justify-between">
           <span className="text-sm text-gray-500">{displayDue}</span>
@@ -639,7 +642,9 @@ const TaskCard = ({
 
                     {/* Comments Section */}
                     <div className="border-t pt-6">
-                      <h3 className="text-lg font-semibold mb-4">Comentários</h3>
+                      <h3 className="text-lg font-semibold mb-4">
+                        Comentários
+                      </h3>
 
                       {/* Comments List */}
                       <div className="space-y-3 max-h-60 overflow-y-auto mb-4">
@@ -746,14 +751,14 @@ const TaskCard = ({
                                         }
                                         isDisabled={!editingContent.trim()}
                                       >
-Salvar
+                                        Salvar
                                       </Button>
                                       <Button
                                         size="sm"
                                         variant="light"
                                         onPress={handleCancelEdit}
                                       >
-Cancelar
+                                        Cancelar
                                       </Button>
                                     </div>
                                   </div>
@@ -784,7 +789,7 @@ Cancelar
                             isLoading={createCommentMutation.isPending}
                             isDisabled={!newComment.trim()}
                           >
-Adicionar Comentário
+                            Adicionar Comentário
                           </Button>
                         </div>
                       </div>
@@ -808,7 +813,7 @@ Adicionar Comentário
                   </>
                 ) : (
                   <Button variant="light" onPress={onClose}>
-Fechar
+                    Fechar
                   </Button>
                 )}
               </ModalFooter>
