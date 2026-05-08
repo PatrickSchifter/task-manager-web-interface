@@ -84,8 +84,12 @@ export default function ProjectPage() {
   const [editDescription, setEditDescription] = useState("");
 
   const { data: tasksResponse, isLoading } = useQuery({
-    queryKey: ["projects", projectId, "tasks"],
-    queryFn: () => listTasksByProject(projectId as string),
+    queryKey: ["projects", projectId, "tasks", { limit: 100, page: 1 }],
+    queryFn: () =>
+      listTasksByProject(projectId as string, {
+        limit: 100,
+        page: 1,
+      }),
     enabled: Boolean(projectId),
     staleTime: 30_000,
   });

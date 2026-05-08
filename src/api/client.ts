@@ -83,8 +83,18 @@ export const updateProject = (id: string, body: ProjectRequest) =>
 export const deleteProject = (id: string) => api.delete(`/v1/projects/${id}`).then((r) => r.data);
 
 // Tasks (scoped by project)
-export const listTasksByProject = (projectId: string) =>
-  api.get<PaginatedResponse<TaskListItem>>(`/v1/projects/${projectId}/tasks`).then((r) => r.data);
+export const listTasksByProject = (
+  projectId: string,
+  params?: {
+    limit?: number;
+    page?: number;
+  },
+) =>
+  api
+    .get<PaginatedResponse<TaskListItem>>(`/v1/projects/${projectId}/tasks`, {
+      params,
+    })
+    .then((r) => r.data);
 
 export const createTask = (projectId: string, body: TaskRequest) =>
   api.post<TaskListItem>(`/v1/projects/${projectId}/tasks`, body).then((r) => r.data);
