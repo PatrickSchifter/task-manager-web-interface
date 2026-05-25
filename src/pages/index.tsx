@@ -1,4 +1,5 @@
 import { createProject, listProjects } from "@/api/client";
+import ChatBot from "@/components/ChatBot";
 import ProjectForm from "@/components/ProjectForm";
 import DefaultLayout from "@/layouts/default";
 import { Button } from "@heroui/button";
@@ -75,7 +76,9 @@ export default function IndexPage() {
                   <h3 className="text-base font-semibold">{project.name}</h3>
                 </CardHeader>
                 <CardBody className="px-4 pb-4 text-sm text-gray-500">
-                  {typeof project.description === "string" ? project.description : ""}
+                  {typeof project.description === "string"
+                    ? project.description
+                    : ""}
                 </CardBody>
               </Card>
             ))}
@@ -95,6 +98,7 @@ export default function IndexPage() {
         isLoading={createProjectMutation.isPending}
         submitButtonText="Criar"
       />
+      <ChatBot />
     </DefaultLayout>
   );
 }
