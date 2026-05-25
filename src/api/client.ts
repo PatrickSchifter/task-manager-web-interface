@@ -157,4 +157,7 @@ export const updateMemberRole = (projectId: string, userId: string, body: Update
 export const removeMember = (projectId: string, userId: string) =>
   api.delete(`/v1/projects/${projectId}/collaborators/${userId}`).then((r) => r.data);
 
+export const sendRagMessage = (body: { message: string }) =>
+  api.post("/v1/rag/chat", body).then((r) => r.data as unknown);
+
 export { api };
