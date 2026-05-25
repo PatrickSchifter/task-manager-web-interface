@@ -13,7 +13,6 @@ export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -23,7 +22,7 @@ export default function ChatBot() {
 
   const sendMessageMutation = useMutation({
     mutationKey: ["projects", "chat"],
-    mutationFn: () => sendRagMessage({ message: input }),
+    mutationFn: (message: string) => sendRagMessage({ message }),
     onSuccess: (data: { answer?: string } | unknown) => {
       const answer =
         typeof data === "object" && data !== null && "answer" in data
@@ -41,14 +40,13 @@ export default function ChatBot() {
   });
 
   const sendMessage = () => {
-    setIsLoading(true);
-    if (!input.trim() || sendMessageMutation.isPending) return;
+    const trimmed = input.trim();
+    if (!trimmed || sendMessageMutation.isPending) return;
 
-    const userMsg: Message = { role: "user", content: input.trim() };
+    const userMsg: Message = { role: "user", content: trimmed };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    sendMessageMutation.mutate();
-    setIsLoading(false);
+    sendMessageMutation.mutate(trimmed); // passa o valor capturado
   };
 
   return (
@@ -176,7 +174,7 @@ export default function ChatBot() {
                 </div>
               </div>
             ))}
-            {isLoading && (
+            {sendMessageMutation.isPending && (
               <div className="flex gap-2 justify-start">
                 <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                   {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
@@ -230,11 +228,11 @@ export default function ChatBot() {
               size="sm"
               color="primary"
               onPress={sendMessage}
-              isLoading={isLoading}
+              isLoading={sendMessageMutation.isPending}
               isDisabled={!input.trim()}
               className="shrink-0 h-8 w-8 min-w-8"
             >
-              {!isLoading && (
+              {!sendMessageMutation.isPending && (
                 // biome-ignore lint/a11y/noSvgWithoutTitle: <explanation>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

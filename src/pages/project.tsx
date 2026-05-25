@@ -13,6 +13,7 @@ import type {
   TaskListItem,
   TaskRequest,
 } from "@/api/client";
+import ChatBot from "@/components/ChatBot";
 import Column from "@/components/Column";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import MembersModal from "@/components/MembersModal";
@@ -599,6 +600,7 @@ export default function ProjectPage() {
           isOwner={isOwner}
         />
       )}
+      <ChatBot />
     </DefaultLayout>
   );
 }
