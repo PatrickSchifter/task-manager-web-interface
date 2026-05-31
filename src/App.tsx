@@ -1,5 +1,7 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
+import { authEvents } from "@/config/api";
 import IndexPage from "@/pages/index";
 import ProjectPage from "@/pages/project";
 import SigninPage from "@/pages/signin";
@@ -8,6 +10,18 @@ import ForgotPasswordPage from "./pages/forgot-password";
 import ResetPasswordPage from "./pages/reset-password";
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const logout = () => {
+      localStorage.removeItem("token");
+      navigate("/signin", { replace: true });
+    };
+
+    authEvents.addEventListener("unauthorized", logout);
+    return () => authEvents.removeEventListener("unauthorized", logout);
+  }, [navigate]);
+
   function RootRoute() {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;

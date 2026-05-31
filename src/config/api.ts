@@ -10,12 +10,14 @@ export const apiClient = axios.create({
 
 export type ApiClient = typeof apiClient;
 
+// Event para comunicar 401 ao React sem dependência circular
+export const authEvents = new EventTarget();
+
 // Attach token from localStorage on every request
 apiClient.interceptors.request.use((config) => {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (token) {
-      // Axios v1 may use AxiosHeaders which supports set()
       if (typeof config.headers?.set === "function") {
         config.headers.set("Authorization", `Bearer ${token}`);
       } else {
@@ -30,3 +32,14 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Auto logout on 401
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      authEvents.dispatchEvent(new Event("unauthorized"));
+    }
+    return Promise.reject(error);
+  },
+);
