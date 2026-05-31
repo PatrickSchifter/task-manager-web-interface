@@ -26,6 +26,8 @@ export type MemberListItem = components["schemas"]["MemberListItemDto"];
 export type AddMemberDto = components["schemas"]["AddMemberDto"];
 export type UpdateMemberRoleDto = components["schemas"]["UpdateMemberRoleDto"];
 
+export type ChatMessageResponseDTO = components["schemas"]["ChatMessageResponseDTO"];
+
 // Shared API response helpers (based on OpenAPI shapes)
 export type PaginatedResponse<T> = {
   data?: T[];
@@ -157,7 +159,20 @@ export const updateMemberRole = (projectId: string, userId: string, body: Update
 export const removeMember = (projectId: string, userId: string) =>
   api.delete(`/v1/projects/${projectId}/collaborators/${userId}`).then((r) => r.data);
 
-export const sendRagMessage = (body: { message: string }) =>
-  api.post("/v1/rag/chat", body).then((r) => r.data as unknown);
+export const sendChatMessage = (body: { message: string }) =>
+  api.post("/v1/chat", body).then((r) => r.data as unknown);
+
+export const getChatMessages = (params?: {
+  limit?: number;
+  page?: number;
+}) =>
+  api
+    .get<ChatMessageResponseDTO[]>("/v1/chat", {
+      params,
+    })
+    .then((r) => r.data);
+
+export const getChatMessage = (id: string) =>
+  api.get<ChatMessageResponseDTO>(`/v1/chat/${id}`).then((r) => r.data);
 
 export { api };

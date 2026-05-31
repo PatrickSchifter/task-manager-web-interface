@@ -593,6 +593,13 @@ export interface components {
        */
       role: "VIEWER" | "EDITOR" | "OWNER";
     };
+    ChatMessageResponseDTO: {
+      id: string;
+      userId: string;
+      content: string;
+      response: string;
+      status: "QUEUED" | "PROCESSING" | "DELIVERED" | "FAILED";
+    };
   };
   responses: never;
   parameters: never;
