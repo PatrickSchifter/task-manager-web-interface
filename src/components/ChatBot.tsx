@@ -235,7 +235,7 @@ export default function ChatBot() {
     if (!apiMessages) return;
 
     const converted: Message[] = [];
-    for (const m of apiMessages) {
+    for (const m of [...apiMessages].reverse()) {
       converted.push({
         id: m.id,
         role: "user",
