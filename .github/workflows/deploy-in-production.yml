@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Roda type-check e lint no runner do GitHub (RAM de sobra), já que o build
+  # no servidor pula essas etapas para economizar memória. Se algo quebrar
+  # aqui, o deploy nem começa.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 900s
+          command_timeout: 900s
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            # Limita o heap do Node ao que cabe na RAM (1GB real + swap) e
+            # desliga a telemetria do Next para reduzir overhead no build.
+            export NODE_OPTIONS="--max-old-space-size=1536"
+            export NEXT_TELEMETRY_DISABLED=1
+            cd web-interface
+            git reset --hard HEAD && git pull origin main
+            npm ci --no-audit --no-fund
+            npm run build
+            pm2 restart web-app
