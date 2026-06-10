@@ -19,13 +19,14 @@
 
 ## 👋 Overview
 
-This is the web client for **Solut Tasks** — a full SaaS platform where teams organize projects, tasks and comments, with a built-in **AI assistant** you can simply *talk to*:
+This is the web client for **Solut Tasks** — a full SaaS platform where teams organize projects, tasks, comments, and **personal routines**, with a built-in **AI assistant** you can simply *talk to*:
 
 > *"What are my high-priority tasks this week?"*
 > *"What's blocking the team right now?"*
 > *"Which tasks are overdue?"*
+> *"What morning routines do I have scheduled?"*
 
-The frontend owns the entire user-facing experience: a real-time collaborative **Kanban board**, the **AI chat** interface, authentication, and every screen from landing page to dashboard. It's a thin-but-serious client — sensitive data is fetched on the server, the JWT never touches client-side JavaScript, and the API contract is type-safe end to end.
+The frontend owns the entire user-facing experience: a real-time collaborative **Kanban board**, the **AI chat** interface, a **personal routines tracker**, authentication, and every screen from landing page to dashboard. It's a thin-but-serious client — sensitive data is fetched on the server, the JWT never touches client-side JavaScript, and the API contract is type-safe end to end.
 
 It's **live in production**, deployed on cloud infrastructure with automated CI/CD, and pairs with a NestJS + Prisma + RabbitMQ backend that powers the AI (RAG) pipeline.
 
@@ -86,11 +87,17 @@ Full auth flow — login, register, forgot-password and reset-password — built
 
 ### Dashboard
 
-An at-a-glance summary: big-number stat cards (active / in-progress / completed tasks), recent projects with progress bars, and upcoming tasks grouped by priority — all rendered server-side from an aggregated backend endpoint.
+An at-a-glance summary: big-number stat cards (active / in-progress / completed tasks), recent projects with progress bars, upcoming tasks grouped by priority, and a **Rotinas de hoje** section showing today's active routines with per-routine completion progress — all rendered server-side from an aggregated backend endpoint.
 
 ### Projects & Tasks
 
 Create and edit projects (with per-project identity gradients), manage tasks through dialogs, assign collaborators, set priorities and due dates, and drill into a dedicated task detail page with comments. The detail page also hosts a **subtasks** section — break a task into one level of subtasks, each with its own status, assignee, priority and due date, reorderable via drag-and-drop, with quick status toggles and a live progress counter.
+
+### Personal Routines
+
+A habit-tracking interface for recurring daily activities. Users create routines with a title, optional description, and one or more **time slots** (start + end in HH:mm). Each slot can be checked off for today with a single tap — the icon toggles between empty and filled, the progress counter updates, and fully completed routines get a strikethrough. Day-of-week chips let users restrict a routine to specific days of the week (empty selection = every day). A pause toggle suspends the routine without deleting its history.
+
+Technically, the form uses a **React 19 `useActionState` + `startTransition`** pattern: because MUI's controlled pickers never reflect in native `FormData`, the `onSubmit` handler manually serialises the time rows and day selection into the `FormData` before handing off to the Server Action — no hidden inputs, no stale reads.
 
 ### Tags & Collaboration
 
@@ -203,8 +210,9 @@ src/
 │   │   ├── contact/  privacy/  terms/  security/
 │   │   └── layout.tsx
 │   ├── (workspace)/         # private routes (behind the middleware)
-│   │   ├── dashboard/       # big numbers, recent projects, upcoming tasks
+│   │   ├── dashboard/       # big numbers, recent projects, upcoming tasks, routines today
 │   │   ├── projects/[id]/   # Kanban board + task detail
+│   │   ├── routines/        # personal habit tracker (CRUD + daily completion toggle)
 │   │   ├── chat/            # AI assistant
 │   │   └── profile/
 │   ├── layout.tsx           # root layout (global providers)
@@ -284,6 +292,9 @@ npm run generate:api-types:prod  # regenerate types from the production OpenAPI
 
 - [x] Per-card accent colors on the dashboard big numbers
 - [x] WebSocket updates for chat delivery (primary path; HTTP polling kept as fallback)
+- [x] Personal routines with start/end time slots, day-of-week scheduling, and daily completion toggle
+- [x] Dashboard routines summary (today's active routines, slot progress, per-routine completion)
+- [x] Mobile-responsive routines page and dialog
 - [ ] Real-time board sync across collaborators
 - [ ] Optimistic UI for comments and tag edits
 - [ ] Light theme support
