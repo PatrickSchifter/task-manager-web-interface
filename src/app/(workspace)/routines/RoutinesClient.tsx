@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Chip,
@@ -48,7 +48,9 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
   const theme = useTheme();
   const today = todayIso();
 
-  // Completed set seeded from server data; never reverts automatically.
+  // Seeded once from server data on mount. Never synced again automatically —
+  // RSC re-renders (triggered by revalidatePath) would overwrite optimistic
+  // state with stale data if we synced on every routines prop change.
   const [completedSet, setCompletedSet] = useState<Set<CompletionKey>>(() =>
     new Set(
       routines.flatMap((r) =>
@@ -58,19 +60,6 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
       ),
     ),
   );
-
-  // Sync when server re-renders with updated routines (create/update/delete).
-  useEffect(() => {
-    setCompletedSet(
-      new Set(
-        routines.flatMap((r) =>
-          r.times
-            .filter((t) => t.completedToday)
-            .map((t) => completionKey(t.id, today)),
-        ),
-      ),
-    );
-  }, [routines, today]);
 
   // Per-slot pending tracking — only the clicked slot shows a spinner.
   const [pendingSet, setPendingSet] = useState<Set<string>>(new Set());
