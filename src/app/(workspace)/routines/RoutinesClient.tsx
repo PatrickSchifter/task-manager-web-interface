@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Chip,
@@ -48,35 +48,62 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
   const theme = useTheme();
   const today = todayIso();
 
-  // Seed initial state from server data so completions survive re-renders.
-  const initialCompleted = new Set<CompletionKey>(
-    routines.flatMap((r) =>
-      r.times
-        .filter((t) => t.completedToday)
-        .map((t) => completionKey(t.id, today)),
+  // Completed set seeded from server data; never reverts automatically.
+  const [completedSet, setCompletedSet] = useState<Set<CompletionKey>>(() =>
+    new Set(
+      routines.flatMap((r) =>
+        r.times
+          .filter((t) => t.completedToday)
+          .map((t) => completionKey(t.id, today)),
+      ),
     ),
   );
 
-  const [optimisticCompleted, addOptimistic] = useOptimistic(
-    initialCompleted,
-    (state: Set<CompletionKey>, key: CompletionKey) => {
-      const next = new Set(state);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    },
-  );
+  // Sync when server re-renders with updated routines (create/update/delete).
+  useEffect(() => {
+    setCompletedSet(
+      new Set(
+        routines.flatMap((r) =>
+          r.times
+            .filter((t) => t.completedToday)
+            .map((t) => completionKey(t.id, today)),
+        ),
+      ),
+    );
+  }, [routines, today]);
 
-  const [isPending, startTransition] = useTransition();
+  // Per-slot pending tracking — only the clicked slot shows a spinner.
+  const [pendingSet, setPendingSet] = useState<Set<string>>(new Set());
 
   const handleToggle = (routineId: string, timeId: string) => {
     const key = completionKey(timeId, today);
-    startTransition(async () => {
-      addOptimistic(key);
-      await toggleCompletionAction(routineId, timeId, today);
+    if (pendingSet.has(key)) return;
+
+    // Immediate optimistic update.
+    setCompletedSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+
+    setPendingSet((prev) => new Set(prev).add(key));
+
+    toggleCompletionAction(routineId, timeId, today).then((result) => {
+      setPendingSet((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
+      if (result.error) {
+        // Revert on server error.
+        setCompletedSet((prev) => {
+          const next = new Set(prev);
+          if (next.has(key)) next.delete(key);
+          else next.add(key);
+          return next;
+        });
+      }
     });
   };
 
@@ -223,8 +250,8 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
                 key={routine.id}
                 routine={routine}
                 today={today}
-                optimisticCompleted={optimisticCompleted}
-                isPending={isPending}
+                completedSet={completedSet}
+                pendingSet={pendingSet}
                 onToggle={handleToggle}
               />
             ))}
@@ -240,22 +267,22 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
 interface RoutineCardProps {
   routine: RoutineItemListDTO;
   today: string;
-  optimisticCompleted: Set<CompletionKey>;
-  isPending: boolean;
+  completedSet: Set<CompletionKey>;
+  pendingSet: Set<string>;
   onToggle: (routineId: string, timeId: string) => void;
 }
 
 function RoutineCard({
   routine,
   today,
-  optimisticCompleted,
-  isPending,
+  completedSet,
+  pendingSet,
   onToggle,
 }: RoutineCardProps) {
   const theme = useTheme();
 
   const doneCount = routine.times.filter((t) =>
-    optimisticCompleted.has(completionKey(t.id, today)),
+    completedSet.has(completionKey(t.id, today)),
   ).length;
   const total = routine.times.length;
   const allDone = doneCount === total && total > 0;
@@ -340,7 +367,8 @@ function RoutineCard({
           .sort((a, b) => a.startTime.localeCompare(b.startTime))
           .map((t) => {
             const key = completionKey(t.id, today);
-            const done = optimisticCompleted.has(key);
+            const done = completedSet.has(key);
+            const isSlotPending = pendingSet.has(key);
             return (
               <Box
                 key={t.id}
@@ -359,7 +387,7 @@ function RoutineCard({
               >
                 <IconButton
                   size="small"
-                  disabled={isPending}
+                  disabled={isSlotPending}
                   onClick={() => onToggle(routine.id, t.id)}
                   sx={{
                     p: { xs: 0.5, sm: 0 },
@@ -373,7 +401,7 @@ function RoutineCard({
                     },
                   }}
                 >
-                  {isPending ? (
+                  {isSlotPending ? (
                     <CircularProgress size={16} color="inherit" />
                   ) : done ? (
                     <CheckCircleOutlineIcon sx={{ fontSize: 20 }} />
