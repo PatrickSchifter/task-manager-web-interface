@@ -6,6 +6,7 @@ export interface RoutineTimeDTO {
   id: string;
   startTime: string;
   endTime: string;
+  completedToday: boolean;
 }
 
 export interface RoutineTimeWithCompletionsDTO extends RoutineTimeDTO {

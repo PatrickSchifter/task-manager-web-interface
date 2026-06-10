@@ -48,9 +48,14 @@ export function RoutinesClient({ routines }: RoutinesClientProps) {
   const theme = useTheme();
   const today = todayIso();
 
-  // RoutineItemListDTO.times is RoutineTimeDTO (no completedDates).
-  // Completions for today come from the full detail endpoint; list page starts empty.
-  const initialCompleted = new Set<CompletionKey>();
+  // Seed initial state from server data so completions survive re-renders.
+  const initialCompleted = new Set<CompletionKey>(
+    routines.flatMap((r) =>
+      r.times
+        .filter((t) => t.completedToday)
+        .map((t) => completionKey(t.id, today)),
+    ),
+  );
 
   const [optimisticCompleted, addOptimistic] = useOptimistic(
     initialCompleted,
