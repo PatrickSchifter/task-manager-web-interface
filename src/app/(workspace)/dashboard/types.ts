@@ -39,3 +39,17 @@ export const priorityConfig: Record<TaskPriorityLevel, PriorityConfigItem> = {
   Média: { color: "warning" },
   Baixa: { color: "success" },
 };
+
+export interface RoutineTodayItem {
+  id: string;
+  title: string;
+  totalSlots: number;
+  completedSlots: number;
+}
+
+export interface RoutinesTodaySummary {
+  todayActiveCount: number;
+  todayTotalSlots: number;
+  todayCompletedSlots: number;
+  items: RoutineTodayItem[];
+}

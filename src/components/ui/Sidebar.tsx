@@ -18,6 +18,7 @@ import {
 import {
   DashboardOutlined,
   AutoAwesomeOutlined,
+  LoopOutlined,
   TagOutlined,
   SearchOutlined,
   SettingsOutlined,
@@ -51,6 +52,12 @@ const NAV_ITEMS = [
     href: "/chat",
     icon: AutoAwesomeOutlined,
     label: "Solut AI",
+    badge: null,
+  },
+  {
+    href: "/routines",
+    icon: LoopOutlined,
+    label: "Rotinas",
     badge: null,
   },
 ] as const;

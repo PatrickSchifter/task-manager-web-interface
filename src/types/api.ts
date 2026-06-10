@@ -833,10 +833,26 @@ export interface components {
             priority: "LOW" | "MEDIUM" | "HIGH";
             status: string;
         };
+        DashboardRoutineItemDTO: {
+            id: string;
+            title: string;
+            totalSlots: number;
+            completedSlots: number;
+        };
+        DashboardRoutineSummaryDTO: {
+            /** @description Active routines for today */
+            todayActiveCount: number;
+            /** @description Total time slots across today's active routines */
+            todayTotalSlots: number;
+            /** @description Completed time slots today */
+            todayCompletedSlots: number;
+            items: components["schemas"]["DashboardRoutineItemDTO"][];
+        };
         DashboardSummaryDTO: {
             stats: components["schemas"]["DashboardStatsDTO"];
             recentProjects: components["schemas"]["DashboardProjectTotalAndDoneDTO"][];
             upcomingTasks: components["schemas"]["DashboardTaskDTO"][];
+            routines: components["schemas"]["DashboardRoutineSummaryDTO"];
         };
     };
     responses: never;

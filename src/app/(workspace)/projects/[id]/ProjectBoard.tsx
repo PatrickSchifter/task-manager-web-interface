@@ -19,7 +19,6 @@ import {
   Settings,
   Add,
   Tag,
-  AutoAwesome,
   PersonAddAlt1,
   CheckBoxOutlined,
   DragIndicator,

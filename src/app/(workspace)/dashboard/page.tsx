@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
-  const { stats, recentProjects, upcomingTasks } =
+  const { stats, recentProjects, upcomingTasks, routines } =
     await dashboardService.getSummary();
 
   const statItems: StatItem[] = [
@@ -103,6 +103,7 @@ export default async function DashboardPage() {
         recentProjects={mappedProjects}
         stats={statItems}
         upcoming={upcoming}
+        routines={routines}
       />
     </WorkspaceLayout>
   );

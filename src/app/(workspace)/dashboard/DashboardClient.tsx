@@ -19,10 +19,14 @@ import {
   CalendarTodayOutlined,
   AddOutlined,
   RocketLaunchOutlined,
+  RepeatOutlined,
+  CheckCircleOutlined,
+  RadioButtonUncheckedOutlined,
 } from "@mui/icons-material";
 import {
   PriorityConfigItem,
   RecentProject,
+  RoutinesTodaySummary,
   StatItem,
   TaskItem,
   TaskPriorityLevel,
@@ -35,6 +39,7 @@ interface IProps {
   recentProjects: RecentProject[];
   upcoming: TaskItem[];
   priorityConfig: Record<TaskPriorityLevel, PriorityConfigItem>;
+  routines: RoutinesTodaySummary;
 }
 
 export default function DashboardClient({
@@ -42,6 +47,7 @@ export default function DashboardClient({
   recentProjects,
   upcoming,
   priorityConfig,
+  routines,
 }: IProps) {
   const theme = useTheme();
   const { user } = useWorkspace();
@@ -641,6 +647,247 @@ export default function DashboardClient({
               ))}
             </Stack>
           </Box>
+        </Box>
+
+        {/* Routines Today */}
+        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 2,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <RepeatOutlined
+                sx={(theme) => ({
+                  fontSize: 18,
+                  color: theme.palette.secondary.main,
+                })}
+              />
+              <Typography
+                variant="h6"
+                sx={(theme) => ({
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: theme.palette.text.primary,
+                  letterSpacing: "-0.01em",
+                })}
+              >
+                Rotinas de hoje
+              </Typography>
+            </Box>
+            <Button
+              component={Link}
+              href="/routines"
+              size="small"
+              endIcon={<NorthEastOutlined sx={{ fontSize: 12 }} />}
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+                fontSize: 12,
+                fontWeight: 500,
+                textTransform: "none",
+                minWidth: 0,
+                p: theme.spacing(0.5, 1),
+                "&:hover": { color: theme.palette.primary.main },
+              })}
+            >
+              Ver tudo
+            </Button>
+          </Box>
+
+          {routines.todayActiveCount === 0 ? (
+            <Card
+              elevation={0}
+              sx={(theme) => ({
+                border: `1px dashed ${theme.palette.divider}`,
+                borderRadius: `${(theme.shape.borderRadius as number) * 2}px`,
+                bgcolor: "transparent",
+                p: theme.spacing(3),
+                textAlign: "center",
+              })}
+            >
+              <Typography
+                variant="body2"
+                sx={(theme) => ({ color: theme.palette.text.disabled })}
+              >
+                Nenhuma rotina ativa para hoje.{" "}
+                <Link
+                  href="/routines"
+                  style={{ color: "inherit", textDecoration: "underline" }}
+                >
+                  Criar uma rotina
+                </Link>
+              </Typography>
+            </Card>
+          ) : (
+            <Card
+              elevation={0}
+              sx={(theme) => ({
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: `${(theme.shape.borderRadius as number) * 2}px`,
+                bgcolor: theme.palette.background.paper,
+                overflow: "hidden",
+              })}
+            >
+              {/* Summary header */}
+              <Box
+                sx={(theme) => ({
+                  px: theme.spacing(2.5),
+                  pt: theme.spacing(2),
+                  pb: theme.spacing(1.5),
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: theme.spacing(2),
+                  flexWrap: "wrap",
+                })}
+              >
+                <Box sx={{ flex: 1, minWidth: 160 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 0.75,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={(theme) => ({
+                        fontWeight: 600,
+                        color: theme.palette.text.secondary,
+                        fontSize: 12,
+                      })}
+                    >
+                      {routines.todayCompletedSlots}/{routines.todayTotalSlots}{" "}
+                      horários concluídos
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={(theme) => ({
+                        fontFamily: "monospace",
+                        fontSize: 11,
+                        color: theme.palette.text.disabled,
+                      })}
+                    >
+                      {routines.todayTotalSlots === 0
+                        ? 0
+                        : Math.round(
+                            (routines.todayCompletedSlots /
+                              routines.todayTotalSlots) *
+                              100,
+                          )}
+                      %
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={
+                      routines.todayTotalSlots === 0
+                        ? 0
+                        : Math.round(
+                            (routines.todayCompletedSlots /
+                              routines.todayTotalSlots) *
+                              100,
+                          )
+                    }
+                    sx={(theme) => ({
+                      height: 5,
+                      borderRadius: 3,
+                      bgcolor: alpha(theme.palette.secondary.main, 0.12),
+                      "& .MuiLinearProgress-bar": {
+                        borderRadius: 3,
+                        bgcolor: theme.palette.secondary.main,
+                      },
+                    })}
+                  />
+                </Box>
+                <Chip
+                  label={`${routines.todayActiveCount} ativa${routines.todayActiveCount !== 1 ? "s" : ""}`}
+                  size="small"
+                  sx={(theme) => ({
+                    height: 22,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                    color: theme.palette.secondary.main,
+                    border: `1px solid ${alpha(theme.palette.secondary.main, 0.25)}`,
+                  })}
+                />
+              </Box>
+
+              {/* Routine rows */}
+              <Stack divider={<Box sx={(theme) => ({ borderTop: `1px solid ${theme.palette.divider}` })} />}>
+                {routines.items.map((routine) => {
+                  const done = routine.completedSlots === routine.totalSlots && routine.totalSlots > 0;
+                  return (
+                    <Box
+                      key={routine.id}
+                      sx={(theme) => ({
+                        px: theme.spacing(2.5),
+                        py: theme.spacing(1.5),
+                        display: "flex",
+                        alignItems: "center",
+                        gap: theme.spacing(1.5),
+                      })}
+                    >
+                      {done ? (
+                        <CheckCircleOutlined
+                          sx={(theme) => ({
+                            fontSize: 18,
+                            color: theme.palette.success.main,
+                            flexShrink: 0,
+                          })}
+                        />
+                      ) : (
+                        <RadioButtonUncheckedOutlined
+                          sx={(theme) => ({
+                            fontSize: 18,
+                            color: theme.palette.text.disabled,
+                            flexShrink: 0,
+                          })}
+                        />
+                      )}
+                      <Typography
+                        variant="body2"
+                        sx={(theme) => ({
+                          flex: 1,
+                          minWidth: 0,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          fontWeight: 500,
+                          fontSize: 13,
+                          color: done
+                            ? theme.palette.text.disabled
+                            : theme.palette.text.primary,
+                          textDecoration: done ? "line-through" : "none",
+                        })}
+                      >
+                        {routine.title}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={(theme) => ({
+                          flexShrink: 0,
+                          fontFamily: "monospace",
+                          fontSize: 11,
+                          color: done
+                            ? theme.palette.success.main
+                            : theme.palette.text.disabled,
+                          fontWeight: done ? 700 : 400,
+                        })}
+                      >
+                        {routine.completedSlots}/{routine.totalSlots}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Stack>
+            </Card>
+          )}
         </Box>
       </Box>
     </Box>
