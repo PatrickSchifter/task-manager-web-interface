@@ -20,6 +20,7 @@ import {
   Bot,
   Check,
   MessageSquare,
+  Repeat2,
   Sparkles,
   Users,
   Zap,
@@ -216,8 +217,8 @@ function Hero() {
           }}
         >
           O workspace all-in-one para times de alta velocidade. Projetos,
-          tarefas e colaboração com IA em tempo real, numa interface única e
-          bonita.
+          tarefas, rotinas pessoais e colaboração com IA em tempo real, numa
+          interface única e bonita.
         </Typography>
 
         <Stack
@@ -401,9 +402,9 @@ function DashboardPreview() {
 
       {/* AI panel */}
       <Grid
-        size={{ xs: 12, md: 6 }}
+        size={{ xs: 12, md: 3 }}
         sx={{
-          borderLeft: `1px solid ${theme.palette.divider}`,
+          borderTop: `1px solid ${theme.palette.divider}`,
           bgcolor: `${theme.palette.background.paper}80`,
           p: theme.spacing(2),
         }}
@@ -452,6 +453,88 @@ function DashboardPreview() {
               Sugira casos de teste para o middleware.
             </Typography>
           </Box>
+        </Stack>
+      </Grid>
+
+      {/* Routines panel */}
+      <Grid
+        size={{ xs: 12, md: 3 }}
+        sx={{
+          borderTop: `1px solid ${theme.palette.divider}`,
+          borderLeft: `1px solid ${theme.palette.divider}`,
+          p: theme.spacing(2),
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ mb: theme.spacing(2), alignItems: "center" }}
+        >
+          <Repeat2 size={16} color={theme.palette.secondary.main} />
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+          >
+            Rotinas de hoje
+          </Typography>
+        </Stack>
+        <Stack spacing={1}>
+          {[
+            { label: "Tomar água", done: true, ratio: "3/3" },
+            { label: "Exercitar", done: false, ratio: "1/2" },
+            { label: "Leitura", done: false, ratio: "0/1" },
+          ].map(({ label, done, ratio }) => (
+            <Box
+              key={label}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: theme.spacing(1),
+                px: theme.spacing(1),
+                py: theme.spacing(0.75),
+                borderRadius: theme.shape.borderRadius,
+                bgcolor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  border: `2px solid ${done ? theme.palette.success.main : theme.palette.text.disabled}`,
+                  bgcolor: done ? theme.palette.success.main : "transparent",
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  flex: 1,
+                  color: done
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.primary,
+                  textDecoration: done ? "line-through" : "none",
+                  fontSize: "0.7rem",
+                }}
+              >
+                {label}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: "monospace",
+                  fontSize: "0.65rem",
+                  color: done
+                    ? theme.palette.success.main
+                    : theme.palette.text.disabled,
+                  fontWeight: done ? 700 : 400,
+                }}
+              >
+                {ratio}
+              </Typography>
+            </Box>
+          ))}
         </Stack>
       </Grid>
     </Grid>
@@ -529,7 +612,7 @@ function FeaturesSection() {
       icon: Bot,
       title: "Chat com IA contextual",
       description:
-        "Converse com a Solut Tasks AI sobre qualquer tarefa. Ela entende o contexto do projeto e gera planos de ação.",
+        "Converse com a Solut Tasks AI sobre qualquer tarefa, projeto ou rotina. Ela entende o contexto e gera planos de ação.",
     },
     {
       icon: Users,
@@ -538,17 +621,17 @@ function FeaturesSection() {
         "Atribua tarefas, marque colegas e veja atualizações ao vivo. Sem mais e-mails infinitos.",
     },
     {
+      icon: Repeat2,
+      title: "Rotinas inteligentes",
+      description:
+        "Cadastre hábitos recorrentes com horário de início e fim, escolha os dias da semana e acompanhe sua evolução diária direto no dashboard.",
+    },
+    {
       icon: MessageSquare,
       title: "Comentários ricos",
       description:
         "Discussões com markdown, menções e anexos diretamente em cada tarefa. Decisões sempre rastreáveis.",
     },
-    // {
-    //   icon: Sparkles,
-    //   title: "Resumos automáticos",
-    //   description:
-    //     "A IA resume threads longas, extrai itens de ação e prepara seu próximo sprint.",
-    // },
     {
       icon: Zap,
       title: "Performance instantânea",
@@ -596,7 +679,7 @@ function FeaturesSection() {
 
       <Grid container spacing={3}>
         {features.map((f) => (
-          <Grid size={{ xs: 12, sm: 6 }} key={f.title}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={f.title}>
             <FeatureCard {...f} />
           </Grid>
         ))}
@@ -781,6 +864,7 @@ function PricingSection() {
               perks={[
                 "Até 5 colaboradores",
                 "Projetos ilimitados",
+                "Rotinas pessoais ilimitadas",
                 "100 mensagens de IA/mês",
               ]}
             />
